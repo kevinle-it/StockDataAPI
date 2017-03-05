@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StockDataServer.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -23,6 +24,22 @@ namespace StockDataServer.Controllers
             }
 
             return false;
+        }
+
+        [HttpGet]
+        public AccountTabModel GetAccountInfoByUsername(string username)
+        {
+            DBStockTrainerDataContext db = new DBStockTrainerDataContext();
+            return (from a in db.GetTable<Account>()
+                    where (a.Username == username)
+                    select new AccountTabModel {
+                        Username = a.Username,
+                        Investment = a.Investment,
+                        AvailableCash = a.AvailableCash,
+                        TotalTrans = a.TotalTrans,
+                        PositiveTrans = a.PositiveTrans,
+                        NegativeTrans = a.NegativeTrans
+                    }).SingleOrDefault();
         }
     }
 }

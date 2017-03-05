@@ -10,72 +10,79 @@ namespace StockDataServer.Controllers
 {
     public class PortfolioController : ApiController
     {
-        //[HttpGet]
-        //public List<PortfolioTabModel> GetPortfolioByAccountID(int accountID)
-        //{
-        //    DBStockTrainerDataContext db = new DBStockTrainerDataContext();
-        //    //return db.Portfolios.FirstOrDefault(x => x.AccountID == accountID);
-        //    return (from p in db.GetTable<Portfolio>()
-        //            from s in db.GetTable<Stock>()
-        //            where ((p.AccountID == accountID) && (p.Ticker == s.Ticker))
-        //            select new PortfolioTabModel {
-        //                Ticker = s.Ticker,
-        //                Name = s.Name,
-        //                Price = s.Price,
-        //                Cost = p.Cost,
-        //                GainLossMoney = 0,
-        //                NumStocks = p.Num,
-        //                ChangeMoney = 0,
-        //                Value = s.Price * p.Num,
-        //                ChangePercent = 0
-        //            }).ToList();
-        //}
+        [HttpGet]
+        public List<PortfolioTabModel> GetPortfolioByUsername(string username)
+        {
+            DBStockTrainerDataContext db = new DBStockTrainerDataContext();
+            //return db.Portfolios.FirstOrDefault(x => x.AccountID == accountID);
+            //if ((from a in db.GetTable<Account>()
+            //    where (a.Username == username)
+            //    select a.Username).ToString() == username)
+            //{
 
-        //[HttpGet]
-        //public PortfolioTabModel GetPortfolioStockByAccountIDAndTicker(int accountID, string ticker)
-        //{
-        //    DBStockTrainerDataContext db = new DBStockTrainerDataContext();
-        //    //return db.Portfolios.FirstOrDefault(x => x.AccountID == accountID);
-        //    return (from p in db.GetTable<Portfolio>()
-        //            from s in db.GetTable<Stock>()
-        //            where ((p.AccountID == accountID) && (p.Ticker == ticker) && (p.Ticker == s.Ticker))
-        //            select new PortfolioTabModel
-        //            {
-        //                Ticker = s.Ticker,
-        //                Name = s.Name,
-        //                Price = s.Price,
-        //                Cost = p.Cost,
-        //                GainLossMoney = 0,
-        //                NumStocks = p.Num,
-        //                ChangeMoney = 0,
-        //                Value = s.Price * p.Num,
-        //                ChangePercent = 0
-        //            }).FirstOrDefault();
-        //}
+            //}
+            return (from p in db.GetTable<Portfolio>()
+                    from s in db.GetTable<Stock>()
+                    where ((p.Username == username) && (p.Ticker == s.Ticker))
+                    select new PortfolioTabModel
+                    {
+                        Ticker = s.Ticker,
+                        Name = s.Name,
+                        Price = s.Price,
+                        Cost = p.Cost,
+                        GainLossMoney = 0,
+                        NumStocks = p.Num,
+                        ChangeMoney = 0,
+                        Value = s.Price * p.Num,
+                        ChangePercent = 0
+                    }).ToList();
+        }
 
-        //[HttpPost]
-        //public bool InsertNewPortfolio(int accountID, string ticker, double cost, 
-        //                                int num)
-        //{
-        //    try
-        //    {
-        //        DBStockTrainerDataContext db = new DBStockTrainerDataContext();
+        [HttpGet]
+        public PortfolioTabModel GetPortfolioByUsernameAndTicker(string username, string ticker)
+        {
+            DBStockTrainerDataContext db = new DBStockTrainerDataContext();
+            //return db.Portfolios.FirstOrDefault(x => x.AccountID == accountID);
+            return (from p in db.GetTable<Portfolio>()
+                    from s in db.GetTable<Stock>()
+                    where ((p.Username == username) && (p.Ticker == ticker) && (p.Ticker == s.Ticker))
+                    select new PortfolioTabModel
+                    {
+                        Ticker = s.Ticker,
+                        Name = s.Name,
+                        Price = s.Price,
+                        Cost = p.Cost,
+                        GainLossMoney = 0,
+                        NumStocks = p.Num,
+                        ChangeMoney = 0,
+                        Value = s.Price * p.Num,
+                        ChangePercent = 0
+                    }).FirstOrDefault();
+        }
 
-        //        Portfolio portfolio = new Portfolio();
-        //        portfolio.AccountID = accountID;
-        //        portfolio.Ticker = ticker;
-        //        portfolio.Cost = cost;
-        //        portfolio.Num = num;
+        [HttpPost]
+        public bool InsertNewPortfolio(string username, string ticker, double cost,
+                                        int num)
+        {
+            try
+            {
+                DBStockTrainerDataContext db = new DBStockTrainerDataContext();
 
-        //        db.Portfolios.InsertOnSubmit(portfolio);
-        //        db.SubmitChanges();
-        //        return true;
-        //    }
-        //    catch
-        //    {
-        //        return false;
-        //    }
-        //}
+                Portfolio portfolio = new Portfolio();
+                portfolio.Username = username;
+                portfolio.Ticker = ticker;
+                portfolio.Cost = cost;
+                portfolio.Num = num;
+
+                db.Portfolios.InsertOnSubmit(portfolio);
+                db.SubmitChanges();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
 
         //[HttpPut]
         //public bool UpdatePortfolio(int accountID, string ticker, double cost,
@@ -101,17 +108,46 @@ namespace StockDataServer.Controllers
         //    }
         //}
 
-        //[HttpDelete]
-        //public bool DeletePortfolio(int accountID)
-        //{
-        //    DBStockTrainerDataContext db = new DBStockTrainerDataContext();
+        [HttpDelete]
+        public bool DeletePortfolioByUsername(string username)
+        {
+            DBStockTrainerDataContext db = new DBStockTrainerDataContext();
 
-        //    Portfolio portfolio = db.Portfolios.FirstOrDefault(x => x.AccountID == accountID);
-        //    if (portfolio == null) return false;
+            var match = (from p in db.GetTable<Portfolio>()
+                         where (p.Username == username)
+                         select p).ToList();
 
-        //    db.Portfolios.DeleteOnSubmit(portfolio);
-        //    db.SubmitChanges();
-        //    return true;
-        //}
+            // Portfolio portfolio = db.Portfolios.FirstOrDefault(x => x.Username == username);
+            //if (portfolio == null) return false;
+
+            //db.Portfolios.DeleteOnSubmit(portfolio);
+
+            if (match == null) return false;
+
+            db.Portfolios.DeleteAllOnSubmit(match);
+            db.SubmitChanges();
+            return true;
+        }
+
+        [HttpDelete]
+        public bool DeletePortfolioByUsernameAndTicker(string username, string ticker)
+        {
+            DBStockTrainerDataContext db = new DBStockTrainerDataContext();
+
+            var match = (from p in db.GetTable<Portfolio>()
+                         where ((p.Username == username) && (p.Ticker == ticker))
+                         select p).SingleOrDefault();
+
+            Portfolio portfolio = db.Portfolios.FirstOrDefault(x => x.Username == username);
+            //if (portfolio == null) return false;
+
+            //db.Portfolios.DeleteOnSubmit(portfolio);
+
+            if (match == null) return false;
+
+            db.Portfolios.DeleteOnSubmit(match);
+            db.SubmitChanges();
+            return true;
+        }
     }
 }
