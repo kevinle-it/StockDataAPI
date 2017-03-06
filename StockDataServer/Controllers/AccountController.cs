@@ -18,7 +18,7 @@ namespace StockDataServer.Controllers
                          where (a.Username == username)
                          select a.Password).SingleOrDefault();
 
-            if (password == match)
+            if (password == match && !string.IsNullOrWhiteSpace(password))
             {
                 return true;
             }
