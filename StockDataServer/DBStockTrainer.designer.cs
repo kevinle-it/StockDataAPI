@@ -18,6 +18,7 @@ namespace StockDataServer
 	using System.Reflection;
 	using System.Linq;
 	using System.Linq.Expressions;
+	using System.Runtime.Serialization;
 	using System.ComponentModel;
 	using System;
 	
@@ -104,6 +105,14 @@ namespace StockDataServer
 			}
 		}
 		
+		public System.Data.Linq.Table<Setting> Settings
+		{
+			get
+			{
+				return this.GetTable<Setting>();
+			}
+		}
+		
 		public System.Data.Linq.Table<Stock> Stocks
 		{
 			get
@@ -130,6 +139,7 @@ namespace StockDataServer
 	}
 	
 	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Account")]
+	[global::System.Runtime.Serialization.DataContractAttribute()]
 	public partial class Account : INotifyPropertyChanging, INotifyPropertyChanged
 	{
 		
@@ -155,6 +165,8 @@ namespace StockDataServer
 		
 		private EntitySet<WatchStock> _WatchStocks;
 		
+		private bool serializing;
+		
     #region Extensibility Method Definitions
     partial void OnLoaded();
     partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -177,13 +189,11 @@ namespace StockDataServer
 		
 		public Account()
 		{
-			this._Portfolios = new EntitySet<Portfolio>(new Action<Portfolio>(this.attach_Portfolios), new Action<Portfolio>(this.detach_Portfolios));
-			this._Transactions = new EntitySet<Transaction>(new Action<Transaction>(this.attach_Transactions), new Action<Transaction>(this.detach_Transactions));
-			this._WatchStocks = new EntitySet<WatchStock>(new Action<WatchStock>(this.attach_WatchStocks), new Action<WatchStock>(this.detach_WatchStocks));
-			OnCreated();
+			this.Initialize();
 		}
 		
 		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Username", DbType="VarChar(50) NOT NULL", CanBeNull=false, IsPrimaryKey=true)]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=1)]
 		public string Username
 		{
 			get
@@ -204,6 +214,7 @@ namespace StockDataServer
 		}
 		
 		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Password", DbType="VarChar(50) NOT NULL", CanBeNull=false)]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=2)]
 		public string Password
 		{
 			get
@@ -224,6 +235,7 @@ namespace StockDataServer
 		}
 		
 		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Investment", DbType="Float NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=3)]
 		public double Investment
 		{
 			get
@@ -244,6 +256,7 @@ namespace StockDataServer
 		}
 		
 		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_AvailableCash", DbType="Float NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=4)]
 		public double AvailableCash
 		{
 			get
@@ -264,6 +277,7 @@ namespace StockDataServer
 		}
 		
 		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_TotalTrans", DbType="BigInt NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=5)]
 		public long TotalTrans
 		{
 			get
@@ -284,6 +298,7 @@ namespace StockDataServer
 		}
 		
 		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PositiveTrans", DbType="BigInt NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=6)]
 		public long PositiveTrans
 		{
 			get
@@ -304,6 +319,7 @@ namespace StockDataServer
 		}
 		
 		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_NegativeTrans", DbType="BigInt NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=7)]
 		public long NegativeTrans
 		{
 			get
@@ -324,10 +340,16 @@ namespace StockDataServer
 		}
 		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_Portfolio", Storage="_Portfolios", ThisKey="Username", OtherKey="Username")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=8, EmitDefaultValue=false)]
 		public EntitySet<Portfolio> Portfolios
 		{
 			get
 			{
+				if ((this.serializing 
+							&& (this._Portfolios.HasLoadedOrAssignedValues == false)))
+				{
+					return null;
+				}
 				return this._Portfolios;
 			}
 			set
@@ -337,10 +359,16 @@ namespace StockDataServer
 		}
 		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_Transaction", Storage="_Transactions", ThisKey="Username", OtherKey="Username")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=9, EmitDefaultValue=false)]
 		public EntitySet<Transaction> Transactions
 		{
 			get
 			{
+				if ((this.serializing 
+							&& (this._Transactions.HasLoadedOrAssignedValues == false)))
+				{
+					return null;
+				}
 				return this._Transactions;
 			}
 			set
@@ -350,10 +378,16 @@ namespace StockDataServer
 		}
 		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_WatchStock", Storage="_WatchStocks", ThisKey="Username", OtherKey="Username")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=10, EmitDefaultValue=false)]
 		public EntitySet<WatchStock> WatchStocks
 		{
 			get
 			{
+				if ((this.serializing 
+							&& (this._WatchStocks.HasLoadedOrAssignedValues == false)))
+				{
+					return null;
+				}
 				return this._WatchStocks;
 			}
 			set
@@ -417,9 +451,39 @@ namespace StockDataServer
 			this.SendPropertyChanging();
 			entity.Account = null;
 		}
+		
+		private void Initialize()
+		{
+			this._Portfolios = new EntitySet<Portfolio>(new Action<Portfolio>(this.attach_Portfolios), new Action<Portfolio>(this.detach_Portfolios));
+			this._Transactions = new EntitySet<Transaction>(new Action<Transaction>(this.attach_Transactions), new Action<Transaction>(this.detach_Transactions));
+			this._WatchStocks = new EntitySet<WatchStock>(new Action<WatchStock>(this.attach_WatchStocks), new Action<WatchStock>(this.detach_WatchStocks));
+			OnCreated();
+		}
+		
+		[global::System.Runtime.Serialization.OnDeserializingAttribute()]
+		[global::System.ComponentModel.EditorBrowsableAttribute(EditorBrowsableState.Never)]
+		public void OnDeserializing(StreamingContext context)
+		{
+			this.Initialize();
+		}
+		
+		[global::System.Runtime.Serialization.OnSerializingAttribute()]
+		[global::System.ComponentModel.EditorBrowsableAttribute(EditorBrowsableState.Never)]
+		public void OnSerializing(StreamingContext context)
+		{
+			this.serializing = true;
+		}
+		
+		[global::System.Runtime.Serialization.OnSerializedAttribute()]
+		[global::System.ComponentModel.EditorBrowsableAttribute(EditorBrowsableState.Never)]
+		public void OnSerialized(StreamingContext context)
+		{
+			this.serializing = false;
+		}
 	}
 	
 	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.InsiderTrades")]
+	[global::System.Runtime.Serialization.DataContractAttribute()]
 	public partial class InsiderTrade : INotifyPropertyChanging, INotifyPropertyChanged
 	{
 		
@@ -469,10 +533,11 @@ namespace StockDataServer
 		
 		public InsiderTrade()
 		{
-			OnCreated();
+			this.Initialize();
 		}
 		
 		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_InsiderTradeID", AutoSync=AutoSync.OnInsert, DbType="BigInt NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=1)]
 		public long InsiderTradeID
 		{
 			get
@@ -493,6 +558,7 @@ namespace StockDataServer
 		}
 		
 		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Ticker", DbType="VarChar(50) NOT NULL", CanBeNull=false)]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=2)]
 		public string Ticker
 		{
 			get
@@ -513,6 +579,7 @@ namespace StockDataServer
 		}
 		
 		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_InsiderDetail", DbType="VarChar(50) NOT NULL", CanBeNull=false)]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=3)]
 		public string InsiderDetail
 		{
 			get
@@ -533,6 +600,7 @@ namespace StockDataServer
 		}
 		
 		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CompanyName", DbType="VarChar(50) NOT NULL", CanBeNull=false)]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=4)]
 		public string CompanyName
 		{
 			get
@@ -553,6 +621,7 @@ namespace StockDataServer
 		}
 		
 		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Type", DbType="VarChar(10) NOT NULL", CanBeNull=false)]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=5)]
 		public string Type
 		{
 			get
@@ -573,6 +642,7 @@ namespace StockDataServer
 		}
 		
 		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Quantity", DbType="BigInt NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=6)]
 		public long Quantity
 		{
 			get
@@ -593,6 +663,7 @@ namespace StockDataServer
 		}
 		
 		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Price", DbType="Float NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=7)]
 		public double Price
 		{
 			get
@@ -613,6 +684,7 @@ namespace StockDataServer
 		}
 		
 		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Total", DbType="Float NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=8)]
 		public double Total
 		{
 			get
@@ -633,6 +705,7 @@ namespace StockDataServer
 		}
 		
 		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Time", DbType="DateTime NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=9)]
 		public System.DateTime Time
 		{
 			get
@@ -671,9 +744,22 @@ namespace StockDataServer
 				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
 			}
 		}
+		
+		private void Initialize()
+		{
+			OnCreated();
+		}
+		
+		[global::System.Runtime.Serialization.OnDeserializingAttribute()]
+		[global::System.ComponentModel.EditorBrowsableAttribute(EditorBrowsableState.Never)]
+		public void OnDeserializing(StreamingContext context)
+		{
+			this.Initialize();
+		}
 	}
 	
 	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Portfolio")]
+	[global::System.Runtime.Serialization.DataContractAttribute()]
 	public partial class Portfolio : INotifyPropertyChanging, INotifyPropertyChanged
 	{
 		
@@ -685,7 +771,7 @@ namespace StockDataServer
 		
 		private double _Cost;
 		
-		private long _Num;
+		private long _NumStocks;
 		
 		private EntityRef<Account> _Account;
 		
@@ -701,18 +787,17 @@ namespace StockDataServer
     partial void OnTickerChanged();
     partial void OnCostChanging(double value);
     partial void OnCostChanged();
-    partial void OnNumChanging(long value);
-    partial void OnNumChanged();
+    partial void OnNumStocksChanging(long value);
+    partial void OnNumStocksChanged();
     #endregion
 		
 		public Portfolio()
 		{
-			this._Account = default(EntityRef<Account>);
-			this._Stock = default(EntityRef<Stock>);
-			OnCreated();
+			this.Initialize();
 		}
 		
 		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Username", DbType="VarChar(50) NOT NULL", CanBeNull=false, IsPrimaryKey=true)]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=1)]
 		public string Username
 		{
 			get
@@ -737,6 +822,7 @@ namespace StockDataServer
 		}
 		
 		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Ticker", DbType="VarChar(10) NOT NULL", CanBeNull=false, IsPrimaryKey=true)]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=2)]
 		public string Ticker
 		{
 			get
@@ -761,6 +847,7 @@ namespace StockDataServer
 		}
 		
 		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Cost", DbType="Float NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=3)]
 		public double Cost
 		{
 			get
@@ -780,22 +867,23 @@ namespace StockDataServer
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Num", DbType="BigInt NOT NULL")]
-		public long Num
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_NumStocks", DbType="BigInt NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=4)]
+		public long NumStocks
 		{
 			get
 			{
-				return this._Num;
+				return this._NumStocks;
 			}
 			set
 			{
-				if ((this._Num != value))
+				if ((this._NumStocks != value))
 				{
-					this.OnNumChanging(value);
+					this.OnNumStocksChanging(value);
 					this.SendPropertyChanging();
-					this._Num = value;
-					this.SendPropertyChanged("Num");
-					this.OnNumChanged();
+					this._NumStocks = value;
+					this.SendPropertyChanged("NumStocks");
+					this.OnNumStocksChanged();
 				}
 			}
 		}
@@ -887,9 +975,72 @@ namespace StockDataServer
 				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
 			}
 		}
+		
+		private void Initialize()
+		{
+			this._Account = default(EntityRef<Account>);
+			this._Stock = default(EntityRef<Stock>);
+			OnCreated();
+		}
+		
+		[global::System.Runtime.Serialization.OnDeserializingAttribute()]
+		[global::System.ComponentModel.EditorBrowsableAttribute(EditorBrowsableState.Never)]
+		public void OnDeserializing(StreamingContext context)
+		{
+			this.Initialize();
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Settings")]
+	[global::System.Runtime.Serialization.DataContractAttribute()]
+	public partial class Setting
+	{
+		
+		private int _AutoUpdateTimer;
+		
+		private bool _EnforceMarketTimings;
+		
+		public Setting()
+		{
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_AutoUpdateTimer", DbType="Int NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=1)]
+		public int AutoUpdateTimer
+		{
+			get
+			{
+				return this._AutoUpdateTimer;
+			}
+			set
+			{
+				if ((this._AutoUpdateTimer != value))
+				{
+					this._AutoUpdateTimer = value;
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EnforceMarketTimings", DbType="Bit NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=2)]
+		public bool EnforceMarketTimings
+		{
+			get
+			{
+				return this._EnforceMarketTimings;
+			}
+			set
+			{
+				if ((this._EnforceMarketTimings != value))
+				{
+					this._EnforceMarketTimings = value;
+				}
+			}
+		}
 	}
 	
 	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Stock")]
+	[global::System.Runtime.Serialization.DataContractAttribute()]
 	public partial class Stock : INotifyPropertyChanging, INotifyPropertyChanged
 	{
 		
@@ -897,15 +1048,53 @@ namespace StockDataServer
 		
 		private string _Ticker;
 		
-		private string _Name;
+		private string _EquityName;
 		
 		private double _Price;
 		
 		private double _PrevClosePrice;
 		
+		private double _HighPrice;
+		
+		private double _LowPrice;
+		
+		private double _OpenPrice;
+		
+		private double _Volume;
+		
+		private double _Change;
+		
+		private double _MarketCap;
+		
+		private double @__52_week_High;
+		
+		private double @__52_week_Low;
+		
+		private double _AskPrice;
+		
+		private double _BidPrice;
+		
+		private double _AskSize;
+		
+		private double _BidSize;
+		
+		private double @__1_Year_Return;
+		
+		private double _Beta;
+		
+		private double _PE_Ratio;
+		
+		private double _Dividend;
+		
+		private double _DividendPercent;
+		
+		private int _UpdateChecker;
+		
 		private EntitySet<Portfolio> _Portfolios;
 		
 		private EntitySet<WatchStock> _WatchStocks;
+		
+		private bool serializing;
 		
     #region Extensibility Method Definitions
     partial void OnLoaded();
@@ -913,22 +1102,57 @@ namespace StockDataServer
     partial void OnCreated();
     partial void OnTickerChanging(string value);
     partial void OnTickerChanged();
-    partial void OnNameChanging(string value);
-    partial void OnNameChanged();
+    partial void OnEquityNameChanging(string value);
+    partial void OnEquityNameChanged();
     partial void OnPriceChanging(double value);
     partial void OnPriceChanged();
     partial void OnPrevClosePriceChanging(double value);
     partial void OnPrevClosePriceChanged();
+    partial void OnHighPriceChanging(double value);
+    partial void OnHighPriceChanged();
+    partial void OnLowPriceChanging(double value);
+    partial void OnLowPriceChanged();
+    partial void OnOpenPriceChanging(double value);
+    partial void OnOpenPriceChanged();
+    partial void OnVolumeChanging(double value);
+    partial void OnVolumeChanged();
+    partial void OnChangeChanging(double value);
+    partial void OnChangeChanged();
+    partial void OnMarketCapChanging(double value);
+    partial void OnMarketCapChanged();
+    partial void On_52_week_HighChanging(double value);
+    partial void On_52_week_HighChanged();
+    partial void On_52_week_LowChanging(double value);
+    partial void On_52_week_LowChanged();
+    partial void OnAskPriceChanging(double value);
+    partial void OnAskPriceChanged();
+    partial void OnBidPriceChanging(double value);
+    partial void OnBidPriceChanged();
+    partial void OnAskSizeChanging(double value);
+    partial void OnAskSizeChanged();
+    partial void OnBidSizeChanging(double value);
+    partial void OnBidSizeChanged();
+    partial void On_1_Year_ReturnChanging(double value);
+    partial void On_1_Year_ReturnChanged();
+    partial void OnBetaChanging(double value);
+    partial void OnBetaChanged();
+    partial void OnPE_RatioChanging(double value);
+    partial void OnPE_RatioChanged();
+    partial void OnDividendChanging(double value);
+    partial void OnDividendChanged();
+    partial void OnDividendPercentChanging(double value);
+    partial void OnDividendPercentChanged();
+    partial void OnUpdateCheckerChanging(int value);
+    partial void OnUpdateCheckerChanged();
     #endregion
 		
 		public Stock()
 		{
-			this._Portfolios = new EntitySet<Portfolio>(new Action<Portfolio>(this.attach_Portfolios), new Action<Portfolio>(this.detach_Portfolios));
-			this._WatchStocks = new EntitySet<WatchStock>(new Action<WatchStock>(this.attach_WatchStocks), new Action<WatchStock>(this.detach_WatchStocks));
-			OnCreated();
+			this.Initialize();
 		}
 		
 		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Ticker", DbType="VarChar(10) NOT NULL", CanBeNull=false, IsPrimaryKey=true)]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=1)]
 		public string Ticker
 		{
 			get
@@ -948,27 +1172,29 @@ namespace StockDataServer
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Name", DbType="VarChar(50) NOT NULL", CanBeNull=false)]
-		public string Name
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EquityName", DbType="VarChar(50) NOT NULL", CanBeNull=false)]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=2)]
+		public string EquityName
 		{
 			get
 			{
-				return this._Name;
+				return this._EquityName;
 			}
 			set
 			{
-				if ((this._Name != value))
+				if ((this._EquityName != value))
 				{
-					this.OnNameChanging(value);
+					this.OnEquityNameChanging(value);
 					this.SendPropertyChanging();
-					this._Name = value;
-					this.SendPropertyChanged("Name");
-					this.OnNameChanged();
+					this._EquityName = value;
+					this.SendPropertyChanged("EquityName");
+					this.OnEquityNameChanged();
 				}
 			}
 		}
 		
 		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Price", DbType="Float NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=3)]
 		public double Price
 		{
 			get
@@ -989,6 +1215,7 @@ namespace StockDataServer
 		}
 		
 		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PrevClosePrice", DbType="Float NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=4)]
 		public double PrevClosePrice
 		{
 			get
@@ -1008,11 +1235,395 @@ namespace StockDataServer
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_HighPrice", DbType="Float NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=5)]
+		public double HighPrice
+		{
+			get
+			{
+				return this._HighPrice;
+			}
+			set
+			{
+				if ((this._HighPrice != value))
+				{
+					this.OnHighPriceChanging(value);
+					this.SendPropertyChanging();
+					this._HighPrice = value;
+					this.SendPropertyChanged("HighPrice");
+					this.OnHighPriceChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LowPrice", DbType="Float NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=6)]
+		public double LowPrice
+		{
+			get
+			{
+				return this._LowPrice;
+			}
+			set
+			{
+				if ((this._LowPrice != value))
+				{
+					this.OnLowPriceChanging(value);
+					this.SendPropertyChanging();
+					this._LowPrice = value;
+					this.SendPropertyChanged("LowPrice");
+					this.OnLowPriceChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OpenPrice", DbType="Float NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=7)]
+		public double OpenPrice
+		{
+			get
+			{
+				return this._OpenPrice;
+			}
+			set
+			{
+				if ((this._OpenPrice != value))
+				{
+					this.OnOpenPriceChanging(value);
+					this.SendPropertyChanging();
+					this._OpenPrice = value;
+					this.SendPropertyChanged("OpenPrice");
+					this.OnOpenPriceChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Volume", DbType="Float NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=8)]
+		public double Volume
+		{
+			get
+			{
+				return this._Volume;
+			}
+			set
+			{
+				if ((this._Volume != value))
+				{
+					this.OnVolumeChanging(value);
+					this.SendPropertyChanging();
+					this._Volume = value;
+					this.SendPropertyChanged("Volume");
+					this.OnVolumeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Change", DbType="Float NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=9)]
+		public double Change
+		{
+			get
+			{
+				return this._Change;
+			}
+			set
+			{
+				if ((this._Change != value))
+				{
+					this.OnChangeChanging(value);
+					this.SendPropertyChanging();
+					this._Change = value;
+					this.SendPropertyChanged("Change");
+					this.OnChangeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MarketCap", DbType="Float NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=10)]
+		public double MarketCap
+		{
+			get
+			{
+				return this._MarketCap;
+			}
+			set
+			{
+				if ((this._MarketCap != value))
+				{
+					this.OnMarketCapChanging(value);
+					this.SendPropertyChanging();
+					this._MarketCap = value;
+					this.SendPropertyChanged("MarketCap");
+					this.OnMarketCapChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Name="[52-week_High]", Storage="__52_week_High", DbType="Float NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=11)]
+		public double _52_week_High
+		{
+			get
+			{
+				return this.@__52_week_High;
+			}
+			set
+			{
+				if ((this.@__52_week_High != value))
+				{
+					this.On_52_week_HighChanging(value);
+					this.SendPropertyChanging();
+					this.@__52_week_High = value;
+					this.SendPropertyChanged("_52_week_High");
+					this.On_52_week_HighChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Name="[52-week_Low]", Storage="__52_week_Low", DbType="Float NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=12)]
+		public double _52_week_Low
+		{
+			get
+			{
+				return this.@__52_week_Low;
+			}
+			set
+			{
+				if ((this.@__52_week_Low != value))
+				{
+					this.On_52_week_LowChanging(value);
+					this.SendPropertyChanging();
+					this.@__52_week_Low = value;
+					this.SendPropertyChanged("_52_week_Low");
+					this.On_52_week_LowChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_AskPrice", DbType="Float NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=13)]
+		public double AskPrice
+		{
+			get
+			{
+				return this._AskPrice;
+			}
+			set
+			{
+				if ((this._AskPrice != value))
+				{
+					this.OnAskPriceChanging(value);
+					this.SendPropertyChanging();
+					this._AskPrice = value;
+					this.SendPropertyChanged("AskPrice");
+					this.OnAskPriceChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_BidPrice", DbType="Float NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=14)]
+		public double BidPrice
+		{
+			get
+			{
+				return this._BidPrice;
+			}
+			set
+			{
+				if ((this._BidPrice != value))
+				{
+					this.OnBidPriceChanging(value);
+					this.SendPropertyChanging();
+					this._BidPrice = value;
+					this.SendPropertyChanged("BidPrice");
+					this.OnBidPriceChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_AskSize", DbType="Float NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=15)]
+		public double AskSize
+		{
+			get
+			{
+				return this._AskSize;
+			}
+			set
+			{
+				if ((this._AskSize != value))
+				{
+					this.OnAskSizeChanging(value);
+					this.SendPropertyChanging();
+					this._AskSize = value;
+					this.SendPropertyChanged("AskSize");
+					this.OnAskSizeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_BidSize", DbType="Float NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=16)]
+		public double BidSize
+		{
+			get
+			{
+				return this._BidSize;
+			}
+			set
+			{
+				if ((this._BidSize != value))
+				{
+					this.OnBidSizeChanging(value);
+					this.SendPropertyChanging();
+					this._BidSize = value;
+					this.SendPropertyChanged("BidSize");
+					this.OnBidSizeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Name="[1-Year_Return]", Storage="__1_Year_Return", DbType="Float NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=17)]
+		public double _1_Year_Return
+		{
+			get
+			{
+				return this.@__1_Year_Return;
+			}
+			set
+			{
+				if ((this.@__1_Year_Return != value))
+				{
+					this.On_1_Year_ReturnChanging(value);
+					this.SendPropertyChanging();
+					this.@__1_Year_Return = value;
+					this.SendPropertyChanged("_1_Year_Return");
+					this.On_1_Year_ReturnChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Beta", DbType="Float NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=18)]
+		public double Beta
+		{
+			get
+			{
+				return this._Beta;
+			}
+			set
+			{
+				if ((this._Beta != value))
+				{
+					this.OnBetaChanging(value);
+					this.SendPropertyChanging();
+					this._Beta = value;
+					this.SendPropertyChanged("Beta");
+					this.OnBetaChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PE_Ratio", DbType="Float NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=19)]
+		public double PE_Ratio
+		{
+			get
+			{
+				return this._PE_Ratio;
+			}
+			set
+			{
+				if ((this._PE_Ratio != value))
+				{
+					this.OnPE_RatioChanging(value);
+					this.SendPropertyChanging();
+					this._PE_Ratio = value;
+					this.SendPropertyChanged("PE_Ratio");
+					this.OnPE_RatioChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Dividend", DbType="Float NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=20)]
+		public double Dividend
+		{
+			get
+			{
+				return this._Dividend;
+			}
+			set
+			{
+				if ((this._Dividend != value))
+				{
+					this.OnDividendChanging(value);
+					this.SendPropertyChanging();
+					this._Dividend = value;
+					this.SendPropertyChanged("Dividend");
+					this.OnDividendChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DividendPercent", DbType="Float NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=21)]
+		public double DividendPercent
+		{
+			get
+			{
+				return this._DividendPercent;
+			}
+			set
+			{
+				if ((this._DividendPercent != value))
+				{
+					this.OnDividendPercentChanging(value);
+					this.SendPropertyChanging();
+					this._DividendPercent = value;
+					this.SendPropertyChanged("DividendPercent");
+					this.OnDividendPercentChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UpdateChecker", AutoSync=AutoSync.Always, DbType="Int NOT NULL IDENTITY", IsDbGenerated=true)]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=22)]
+		public int UpdateChecker
+		{
+			get
+			{
+				return this._UpdateChecker;
+			}
+			set
+			{
+				if ((this._UpdateChecker != value))
+				{
+					this.OnUpdateCheckerChanging(value);
+					this.SendPropertyChanging();
+					this._UpdateChecker = value;
+					this.SendPropertyChanged("UpdateChecker");
+					this.OnUpdateCheckerChanged();
+				}
+			}
+		}
+		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Stock_Portfolio", Storage="_Portfolios", ThisKey="Ticker", OtherKey="Ticker")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=23, EmitDefaultValue=false)]
 		public EntitySet<Portfolio> Portfolios
 		{
 			get
 			{
+				if ((this.serializing 
+							&& (this._Portfolios.HasLoadedOrAssignedValues == false)))
+				{
+					return null;
+				}
 				return this._Portfolios;
 			}
 			set
@@ -1022,10 +1633,16 @@ namespace StockDataServer
 		}
 		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Stock_WatchStock", Storage="_WatchStocks", ThisKey="Ticker", OtherKey="Ticker")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=24, EmitDefaultValue=false)]
 		public EntitySet<WatchStock> WatchStocks
 		{
 			get
 			{
+				if ((this.serializing 
+							&& (this._WatchStocks.HasLoadedOrAssignedValues == false)))
+				{
+					return null;
+				}
 				return this._WatchStocks;
 			}
 			set
@@ -1077,9 +1694,38 @@ namespace StockDataServer
 			this.SendPropertyChanging();
 			entity.Stock = null;
 		}
+		
+		private void Initialize()
+		{
+			this._Portfolios = new EntitySet<Portfolio>(new Action<Portfolio>(this.attach_Portfolios), new Action<Portfolio>(this.detach_Portfolios));
+			this._WatchStocks = new EntitySet<WatchStock>(new Action<WatchStock>(this.attach_WatchStocks), new Action<WatchStock>(this.detach_WatchStocks));
+			OnCreated();
+		}
+		
+		[global::System.Runtime.Serialization.OnDeserializingAttribute()]
+		[global::System.ComponentModel.EditorBrowsableAttribute(EditorBrowsableState.Never)]
+		public void OnDeserializing(StreamingContext context)
+		{
+			this.Initialize();
+		}
+		
+		[global::System.Runtime.Serialization.OnSerializingAttribute()]
+		[global::System.ComponentModel.EditorBrowsableAttribute(EditorBrowsableState.Never)]
+		public void OnSerializing(StreamingContext context)
+		{
+			this.serializing = true;
+		}
+		
+		[global::System.Runtime.Serialization.OnSerializedAttribute()]
+		[global::System.ComponentModel.EditorBrowsableAttribute(EditorBrowsableState.Never)]
+		public void OnSerialized(StreamingContext context)
+		{
+			this.serializing = false;
+		}
 	}
 	
 	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Transactions")]
+	[global::System.Runtime.Serialization.DataContractAttribute()]
 	public partial class Transaction : INotifyPropertyChanging, INotifyPropertyChanged
 	{
 		
@@ -1091,21 +1737,21 @@ namespace StockDataServer
 		
 		private string _Ticker;
 		
-		private string _Name;
+		private string _EquityName;
 		
 		private System.DateTime _Date;
 		
 		private string _Type;
 		
-		private long _Num;
+		private long _NumStocks;
 		
 		private double _Price;
 		
-		private double _AvrBuyPrice;
+		private double _AvgBuyPrice;
 		
 		private System.Nullable<double> _GainLossMoney;
 		
-		private System.Nullable<double> _GainLossLPercent;
+		private System.Nullable<double> _GainLossPercent;
 		
 		private EntityRef<Account> _Account;
 		
@@ -1119,31 +1765,31 @@ namespace StockDataServer
     partial void OnUsernameChanged();
     partial void OnTickerChanging(string value);
     partial void OnTickerChanged();
-    partial void OnNameChanging(string value);
-    partial void OnNameChanged();
+    partial void OnEquityNameChanging(string value);
+    partial void OnEquityNameChanged();
     partial void OnDateChanging(System.DateTime value);
     partial void OnDateChanged();
     partial void OnTypeChanging(string value);
     partial void OnTypeChanged();
-    partial void OnNumChanging(long value);
-    partial void OnNumChanged();
+    partial void OnNumStocksChanging(long value);
+    partial void OnNumStocksChanged();
     partial void OnPriceChanging(double value);
     partial void OnPriceChanged();
-    partial void OnAvrBuyPriceChanging(double value);
-    partial void OnAvrBuyPriceChanged();
+    partial void OnAvgBuyPriceChanging(double value);
+    partial void OnAvgBuyPriceChanged();
     partial void OnGainLossMoneyChanging(System.Nullable<double> value);
     partial void OnGainLossMoneyChanged();
-    partial void OnGainLossLPercentChanging(System.Nullable<double> value);
-    partial void OnGainLossLPercentChanged();
+    partial void OnGainLossPercentChanging(System.Nullable<double> value);
+    partial void OnGainLossPercentChanged();
     #endregion
 		
 		public Transaction()
 		{
-			this._Account = default(EntityRef<Account>);
-			OnCreated();
+			this.Initialize();
 		}
 		
 		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_TransactionID", AutoSync=AutoSync.OnInsert, DbType="BigInt NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=1)]
 		public long TransactionID
 		{
 			get
@@ -1164,6 +1810,7 @@ namespace StockDataServer
 		}
 		
 		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Username", DbType="VarChar(50) NOT NULL", CanBeNull=false)]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=2)]
 		public string Username
 		{
 			get
@@ -1188,6 +1835,7 @@ namespace StockDataServer
 		}
 		
 		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Ticker", DbType="VarChar(10) NOT NULL", CanBeNull=false)]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=3)]
 		public string Ticker
 		{
 			get
@@ -1207,27 +1855,29 @@ namespace StockDataServer
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Name", DbType="VarChar(50) NOT NULL", CanBeNull=false)]
-		public string Name
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EquityName", DbType="VarChar(50) NOT NULL", CanBeNull=false)]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=4)]
+		public string EquityName
 		{
 			get
 			{
-				return this._Name;
+				return this._EquityName;
 			}
 			set
 			{
-				if ((this._Name != value))
+				if ((this._EquityName != value))
 				{
-					this.OnNameChanging(value);
+					this.OnEquityNameChanging(value);
 					this.SendPropertyChanging();
-					this._Name = value;
-					this.SendPropertyChanged("Name");
-					this.OnNameChanged();
+					this._EquityName = value;
+					this.SendPropertyChanged("EquityName");
+					this.OnEquityNameChanged();
 				}
 			}
 		}
 		
 		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Date", DbType="Date NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=5)]
 		public System.DateTime Date
 		{
 			get
@@ -1248,6 +1898,7 @@ namespace StockDataServer
 		}
 		
 		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Type", DbType="VarChar(10) NOT NULL", CanBeNull=false)]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=6)]
 		public string Type
 		{
 			get
@@ -1267,27 +1918,29 @@ namespace StockDataServer
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Num", DbType="BigInt NOT NULL")]
-		public long Num
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_NumStocks", DbType="BigInt NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=7)]
+		public long NumStocks
 		{
 			get
 			{
-				return this._Num;
+				return this._NumStocks;
 			}
 			set
 			{
-				if ((this._Num != value))
+				if ((this._NumStocks != value))
 				{
-					this.OnNumChanging(value);
+					this.OnNumStocksChanging(value);
 					this.SendPropertyChanging();
-					this._Num = value;
-					this.SendPropertyChanged("Num");
-					this.OnNumChanged();
+					this._NumStocks = value;
+					this.SendPropertyChanged("NumStocks");
+					this.OnNumStocksChanged();
 				}
 			}
 		}
 		
 		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Price", DbType="Float NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=8)]
 		public double Price
 		{
 			get
@@ -1307,27 +1960,29 @@ namespace StockDataServer
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_AvrBuyPrice", DbType="Float NOT NULL")]
-		public double AvrBuyPrice
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_AvgBuyPrice", DbType="Float NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=9)]
+		public double AvgBuyPrice
 		{
 			get
 			{
-				return this._AvrBuyPrice;
+				return this._AvgBuyPrice;
 			}
 			set
 			{
-				if ((this._AvrBuyPrice != value))
+				if ((this._AvgBuyPrice != value))
 				{
-					this.OnAvrBuyPriceChanging(value);
+					this.OnAvgBuyPriceChanging(value);
 					this.SendPropertyChanging();
-					this._AvrBuyPrice = value;
-					this.SendPropertyChanged("AvrBuyPrice");
-					this.OnAvrBuyPriceChanged();
+					this._AvgBuyPrice = value;
+					this.SendPropertyChanged("AvgBuyPrice");
+					this.OnAvgBuyPriceChanged();
 				}
 			}
 		}
 		
 		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_GainLossMoney", DbType="Float")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=10)]
 		public System.Nullable<double> GainLossMoney
 		{
 			get
@@ -1347,22 +2002,23 @@ namespace StockDataServer
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_GainLossLPercent", DbType="Float")]
-		public System.Nullable<double> GainLossLPercent
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_GainLossPercent", DbType="Float")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=11)]
+		public System.Nullable<double> GainLossPercent
 		{
 			get
 			{
-				return this._GainLossLPercent;
+				return this._GainLossPercent;
 			}
 			set
 			{
-				if ((this._GainLossLPercent != value))
+				if ((this._GainLossPercent != value))
 				{
-					this.OnGainLossLPercentChanging(value);
+					this.OnGainLossPercentChanging(value);
 					this.SendPropertyChanging();
-					this._GainLossLPercent = value;
-					this.SendPropertyChanged("GainLossLPercent");
-					this.OnGainLossLPercentChanged();
+					this._GainLossPercent = value;
+					this.SendPropertyChanged("GainLossPercent");
+					this.OnGainLossPercentChanged();
 				}
 			}
 		}
@@ -1420,9 +2076,23 @@ namespace StockDataServer
 				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
 			}
 		}
+		
+		private void Initialize()
+		{
+			this._Account = default(EntityRef<Account>);
+			OnCreated();
+		}
+		
+		[global::System.Runtime.Serialization.OnDeserializingAttribute()]
+		[global::System.ComponentModel.EditorBrowsableAttribute(EditorBrowsableState.Never)]
+		public void OnDeserializing(StreamingContext context)
+		{
+			this.Initialize();
+		}
 	}
 	
 	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.WatchStock")]
+	[global::System.Runtime.Serialization.DataContractAttribute()]
 	public partial class WatchStock : INotifyPropertyChanging, INotifyPropertyChanged
 	{
 		
@@ -1448,12 +2118,11 @@ namespace StockDataServer
 		
 		public WatchStock()
 		{
-			this._Account = default(EntityRef<Account>);
-			this._Stock = default(EntityRef<Stock>);
-			OnCreated();
+			this.Initialize();
 		}
 		
 		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Username", DbType="VarChar(50) NOT NULL", CanBeNull=false, IsPrimaryKey=true)]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=1)]
 		public string Username
 		{
 			get
@@ -1478,6 +2147,7 @@ namespace StockDataServer
 		}
 		
 		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Ticker", DbType="VarChar(10) NOT NULL", CanBeNull=false, IsPrimaryKey=true)]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=2)]
 		public string Ticker
 		{
 			get
@@ -1587,6 +2257,20 @@ namespace StockDataServer
 			{
 				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
 			}
+		}
+		
+		private void Initialize()
+		{
+			this._Account = default(EntityRef<Account>);
+			this._Stock = default(EntityRef<Stock>);
+			OnCreated();
+		}
+		
+		[global::System.Runtime.Serialization.OnDeserializingAttribute()]
+		[global::System.ComponentModel.EditorBrowsableAttribute(EditorBrowsableState.Never)]
+		public void OnDeserializing(StreamingContext context)
+		{
+			this.Initialize();
 		}
 	}
 }

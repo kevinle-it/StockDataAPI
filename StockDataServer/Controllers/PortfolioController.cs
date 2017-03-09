@@ -11,7 +11,7 @@ namespace StockDataServer.Controllers
     public class PortfolioController : ApiController
     {
         [HttpGet]
-        public List<PortfolioTabModel> GetPortfolioByUsername(string username)
+        public List<PortfolioTabModel> GetPortfoliosByUsername(string username)
         {
             DBStockTrainerDataContext db = new DBStockTrainerDataContext();
             //return db.Portfolios.FirstOrDefault(x => x.AccountID == accountID);
@@ -27,13 +27,13 @@ namespace StockDataServer.Controllers
                     select new PortfolioTabModel
                     {
                         Ticker = s.Ticker,
-                        Name = s.Name,
+                        EquityName = s.EquityName,
                         Price = s.Price,
                         Cost = p.Cost,
                         GainLossMoney = 0,
-                        NumStocks = p.Num,
+                        NumStocks = p.NumStocks,
                         ChangeMoney = 0,
-                        Value = s.Price * p.Num,
+                        Value = s.Price * p.NumStocks,
                         ChangePercent = 0
                     }).ToList();
         }
@@ -49,20 +49,20 @@ namespace StockDataServer.Controllers
                     select new PortfolioTabModel
                     {
                         Ticker = s.Ticker,
-                        Name = s.Name,
+                        EquityName = s.EquityName,
                         Price = s.Price,
                         Cost = p.Cost,
                         GainLossMoney = 0,
-                        NumStocks = p.Num,
+                        NumStocks = p.NumStocks,
                         ChangeMoney = 0,
-                        Value = s.Price * p.Num,
+                        Value = s.Price * p.NumStocks,
                         ChangePercent = 0
                     }).FirstOrDefault();
         }
 
         [HttpPost]
         public bool InsertNewPortfolio(string username, string ticker, double cost,
-                                        int num)
+                                        int numStocks)
         {
             try
             {
@@ -72,7 +72,7 @@ namespace StockDataServer.Controllers
                 portfolio.Username = username;
                 portfolio.Ticker = ticker;
                 portfolio.Cost = cost;
-                portfolio.Num = num;
+                portfolio.NumStocks = numStocks;
 
                 db.Portfolios.InsertOnSubmit(portfolio);
                 db.SubmitChanges();

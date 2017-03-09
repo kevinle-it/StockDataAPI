@@ -24,7 +24,7 @@ namespace StockDataServer.Controllers
         }
 
         [HttpPost]
-        public bool InsertNewStock(string ticker, string name, 
+        public bool InsertNewStock(string ticker, string equityName, 
                                     float price, float prevClosePrice)
         {
             try
@@ -33,7 +33,7 @@ namespace StockDataServer.Controllers
 
                 Stock stock = new Stock();
                 stock.Ticker = ticker;
-                stock.Name = name;
+                stock.EquityName = equityName;
                 stock.Price = price;
                 stock.PrevClosePrice = prevClosePrice;
 
@@ -48,7 +48,7 @@ namespace StockDataServer.Controllers
         }
 
         [HttpPut]
-        public bool UpdateStock(string ticker, string name,
+        public bool UpdateStock(string ticker, string equityName,
                                     float price, float prevClosePrice)
         {
             try
@@ -58,7 +58,7 @@ namespace StockDataServer.Controllers
                 Stock stock = db.Stocks.FirstOrDefault(x => x.Ticker == ticker);
                 if (stock == null) return false;
                 
-                stock.Name = name;
+                stock.EquityName = equityName;
                 stock.Price = price;
                 stock.PrevClosePrice = prevClosePrice;
 

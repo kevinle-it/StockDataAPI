@@ -8,7 +8,7 @@ namespace StockDataServer.Models
     public class PortfolioTabModel
     {
         public string Ticker { get; set; }
-        public string Name { get; set; }
+        public string EquityName { get; set; }
         public double Price { get; set; }
         public double Cost { get; set; }
         public double GainLossMoney { get; set; }
