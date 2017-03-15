@@ -25,7 +25,7 @@ namespace StockDataServer.Controllers
 
         [HttpPost]
         public bool InsertNewStock(string ticker, string equityName, 
-                                    float price, float prevClosePrice)
+                                    decimal price, decimal prevClosePrice)
         {
             try
             {
@@ -49,7 +49,7 @@ namespace StockDataServer.Controllers
 
         [HttpPut]
         public bool UpdateStock(string ticker, string equityName,
-                                    float price, float prevClosePrice)
+                                    decimal price, decimal prevClosePrice)
         {
             try
             {

@@ -8,8 +8,8 @@ namespace StockDataServer.Models
     public class AccountTabModel
     {
         public string Username { get; set; }
-        public double Investment { get; set; }
-        public double AvailableCash { get; set; }
+        public decimal StartingInvestment { get; set; }
+        public decimal AvailableCash { get; set; }
         public long TotalTrans { get; set; }
         public long PositiveTrans { get; set; }
         public long NegativeTrans { get; set; }

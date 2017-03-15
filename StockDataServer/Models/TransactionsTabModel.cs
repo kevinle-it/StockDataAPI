@@ -12,9 +12,8 @@ namespace StockDataServer.Models
         public DateTime Date { get; set; }
         public string Type { get; set; }
         public long NumStocks { get; set; }
-        public double Price { get; set; }
-        public double AvgBuyPrice { get; set; }
-        public double? GainLossMoney { get; set; } = 0;
-        public double? GainLossPercent { get; set; } = 0;
+        public decimal Price { get; set; }
+        public decimal? GainLossMoney { get; set; } = 0;
+        public decimal? GainLossPercent { get; set; } = 0;
     }
 }

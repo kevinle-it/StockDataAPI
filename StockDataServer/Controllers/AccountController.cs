@@ -34,7 +34,7 @@ namespace StockDataServer.Controllers
                     where (a.Username == username)
                     select new AccountTabModel {
                         Username = a.Username,
-                        Investment = a.Investment,
+                        StartingInvestment = a.StartingInvestment,
                         AvailableCash = a.AvailableCash,
                         TotalTrans = a.TotalTrans,
                         PositiveTrans = a.PositiveTrans,

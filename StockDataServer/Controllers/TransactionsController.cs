@@ -26,7 +26,6 @@ namespace StockDataServer.Controllers
                         Type = t.Type,
                         NumStocks = t.NumStocks,
                         Price = t.Price,
-                        AvgBuyPrice = t.AvgBuyPrice,
                         GainLossMoney = t.GainLossMoney,
                         GainLossPercent = t.GainLossPercent
                     }).ToList();
@@ -35,9 +34,9 @@ namespace StockDataServer.Controllers
         [HttpPost]
         public bool InsertNewTransaction(string ticker, string equityName, 
                                          DateTime date, string type,
-                                         long numStocks, double price,
-                                         double avgBuyPrice, double gainLossMoney,
-                                         double gainLossPercent)
+                                         long numStocks, decimal price,
+                                         decimal gainLossMoney,
+                                         decimal gainLossPercent)
         {
             try
             {
@@ -50,7 +49,6 @@ namespace StockDataServer.Controllers
                 transaction.Type = type;
                 transaction.NumStocks = numStocks;
                 transaction.Price = price;
-                transaction.AvgBuyPrice = avgBuyPrice;
                 transaction.GainLossMoney = gainLossMoney;
                 transaction.GainLossPercent = gainLossPercent;
 

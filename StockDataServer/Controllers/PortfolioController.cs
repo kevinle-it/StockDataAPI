@@ -61,7 +61,7 @@ namespace StockDataServer.Controllers
         }
 
         [HttpPost]
-        public bool InsertNewPortfolio(string username, string ticker, double cost,
+        public bool InsertNewPortfolio(string username, string ticker, decimal cost,
                                         int numStocks)
         {
             try

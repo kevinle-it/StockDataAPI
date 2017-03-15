@@ -34,6 +34,9 @@ namespace StockDataServer
     partial void InsertAccount(Account instance);
     partial void UpdateAccount(Account instance);
     partial void DeleteAccount(Account instance);
+    partial void InsertHistory(History instance);
+    partial void UpdateHistory(History instance);
+    partial void DeleteHistory(History instance);
     partial void InsertInsiderTrade(InsiderTrade instance);
     partial void UpdateInsiderTrade(InsiderTrade instance);
     partial void DeleteInsiderTrade(InsiderTrade instance);
@@ -86,6 +89,14 @@ namespace StockDataServer
 			get
 			{
 				return this.GetTable<Account>();
+			}
+		}
+		
+		public System.Data.Linq.Table<History> Histories
+		{
+			get
+			{
+				return this.GetTable<History>();
 			}
 		}
 		
@@ -149,9 +160,9 @@ namespace StockDataServer
 		
 		private string _Password;
 		
-		private double _Investment;
+		private decimal _StartingInvestment;
 		
-		private double _AvailableCash;
+		private decimal _AvailableCash;
 		
 		private long _TotalTrans;
 		
@@ -175,9 +186,9 @@ namespace StockDataServer
     partial void OnUsernameChanged();
     partial void OnPasswordChanging(string value);
     partial void OnPasswordChanged();
-    partial void OnInvestmentChanging(double value);
-    partial void OnInvestmentChanged();
-    partial void OnAvailableCashChanging(double value);
+    partial void OnStartingInvestmentChanging(decimal value);
+    partial void OnStartingInvestmentChanged();
+    partial void OnAvailableCashChanging(decimal value);
     partial void OnAvailableCashChanged();
     partial void OnTotalTransChanging(long value);
     partial void OnTotalTransChanged();
@@ -234,30 +245,30 @@ namespace StockDataServer
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Investment", DbType="Float NOT NULL")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_StartingInvestment", DbType="Decimal(20,2) NOT NULL")]
 		[global::System.Runtime.Serialization.DataMemberAttribute(Order=3)]
-		public double Investment
+		public decimal StartingInvestment
 		{
 			get
 			{
-				return this._Investment;
+				return this._StartingInvestment;
 			}
 			set
 			{
-				if ((this._Investment != value))
+				if ((this._StartingInvestment != value))
 				{
-					this.OnInvestmentChanging(value);
+					this.OnStartingInvestmentChanging(value);
 					this.SendPropertyChanging();
-					this._Investment = value;
-					this.SendPropertyChanged("Investment");
-					this.OnInvestmentChanged();
+					this._StartingInvestment = value;
+					this.SendPropertyChanged("StartingInvestment");
+					this.OnStartingInvestmentChanged();
 				}
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_AvailableCash", DbType="Float NOT NULL")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_AvailableCash", DbType="Decimal(20,2) NOT NULL")]
 		[global::System.Runtime.Serialization.DataMemberAttribute(Order=4)]
-		public double AvailableCash
+		public decimal AvailableCash
 		{
 			get
 			{
@@ -482,7 +493,174 @@ namespace StockDataServer
 		}
 	}
 	
-	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.InsiderTrades")]
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.History")]
+	[global::System.Runtime.Serialization.DataContractAttribute()]
+	public partial class History : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private string _Ticker;
+		
+		private System.DateTime _Time;
+		
+		private decimal _HistoryPrice;
+		
+		private EntityRef<Stock> _Stock;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnTickerChanging(string value);
+    partial void OnTickerChanged();
+    partial void OnTimeChanging(System.DateTime value);
+    partial void OnTimeChanged();
+    partial void OnHistoryPriceChanging(decimal value);
+    partial void OnHistoryPriceChanged();
+    #endregion
+		
+		public History()
+		{
+			this.Initialize();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Ticker", DbType="VarChar(10) NOT NULL", CanBeNull=false, IsPrimaryKey=true)]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=1)]
+		public string Ticker
+		{
+			get
+			{
+				return this._Ticker;
+			}
+			set
+			{
+				if ((this._Ticker != value))
+				{
+					if (this._Stock.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnTickerChanging(value);
+					this.SendPropertyChanging();
+					this._Ticker = value;
+					this.SendPropertyChanged("Ticker");
+					this.OnTickerChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Time", DbType="DateTime NOT NULL", IsPrimaryKey=true)]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=2)]
+		public System.DateTime Time
+		{
+			get
+			{
+				return this._Time;
+			}
+			set
+			{
+				if ((this._Time != value))
+				{
+					this.OnTimeChanging(value);
+					this.SendPropertyChanging();
+					this._Time = value;
+					this.SendPropertyChanged("Time");
+					this.OnTimeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_HistoryPrice", DbType="Decimal(20,2) NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=3)]
+		public decimal HistoryPrice
+		{
+			get
+			{
+				return this._HistoryPrice;
+			}
+			set
+			{
+				if ((this._HistoryPrice != value))
+				{
+					this.OnHistoryPriceChanging(value);
+					this.SendPropertyChanging();
+					this._HistoryPrice = value;
+					this.SendPropertyChanged("HistoryPrice");
+					this.OnHistoryPriceChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Stock_History", Storage="_Stock", ThisKey="Ticker", OtherKey="Ticker", IsForeignKey=true)]
+		public Stock Stock
+		{
+			get
+			{
+				return this._Stock.Entity;
+			}
+			set
+			{
+				Stock previousValue = this._Stock.Entity;
+				if (((previousValue != value) 
+							|| (this._Stock.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Stock.Entity = null;
+						previousValue.Histories.Remove(this);
+					}
+					this._Stock.Entity = value;
+					if ((value != null))
+					{
+						value.Histories.Add(this);
+						this._Ticker = value.Ticker;
+					}
+					else
+					{
+						this._Ticker = default(string);
+					}
+					this.SendPropertyChanged("Stock");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void Initialize()
+		{
+			this._Stock = default(EntityRef<Stock>);
+			OnCreated();
+		}
+		
+		[global::System.Runtime.Serialization.OnDeserializingAttribute()]
+		[global::System.ComponentModel.EditorBrowsableAttribute(EditorBrowsableState.Never)]
+		public void OnDeserializing(StreamingContext context)
+		{
+			this.Initialize();
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.InsiderTrade")]
 	[global::System.Runtime.Serialization.DataContractAttribute()]
 	public partial class InsiderTrade : INotifyPropertyChanging, INotifyPropertyChanged
 	{
@@ -501,9 +679,9 @@ namespace StockDataServer
 		
 		private long _Quantity;
 		
-		private double _Price;
+		private decimal _Price;
 		
-		private double _Total;
+		private long _Total;
 		
 		private System.DateTime _Time;
 		
@@ -523,9 +701,9 @@ namespace StockDataServer
     partial void OnTypeChanged();
     partial void OnQuantityChanging(long value);
     partial void OnQuantityChanged();
-    partial void OnPriceChanging(double value);
+    partial void OnPriceChanging(decimal value);
     partial void OnPriceChanged();
-    partial void OnTotalChanging(double value);
+    partial void OnTotalChanging(long value);
     partial void OnTotalChanged();
     partial void OnTimeChanging(System.DateTime value);
     partial void OnTimeChanged();
@@ -662,9 +840,9 @@ namespace StockDataServer
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Price", DbType="Float NOT NULL")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Price", DbType="Decimal(20,2) NOT NULL")]
 		[global::System.Runtime.Serialization.DataMemberAttribute(Order=7)]
-		public double Price
+		public decimal Price
 		{
 			get
 			{
@@ -683,9 +861,9 @@ namespace StockDataServer
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Total", DbType="Float NOT NULL")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Total", DbType="BigInt NOT NULL")]
 		[global::System.Runtime.Serialization.DataMemberAttribute(Order=8)]
-		public double Total
+		public long Total
 		{
 			get
 			{
@@ -769,7 +947,7 @@ namespace StockDataServer
 		
 		private string _Ticker;
 		
-		private double _Cost;
+		private decimal _Cost;
 		
 		private long _NumStocks;
 		
@@ -785,7 +963,7 @@ namespace StockDataServer
     partial void OnUsernameChanged();
     partial void OnTickerChanging(string value);
     partial void OnTickerChanged();
-    partial void OnCostChanging(double value);
+    partial void OnCostChanging(decimal value);
     partial void OnCostChanged();
     partial void OnNumStocksChanging(long value);
     partial void OnNumStocksChanged();
@@ -846,9 +1024,9 @@ namespace StockDataServer
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Cost", DbType="Float NOT NULL")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Cost", DbType="Decimal(20,2) NOT NULL")]
 		[global::System.Runtime.Serialization.DataMemberAttribute(Order=3)]
-		public double Cost
+		public decimal Cost
 		{
 			get
 			{
@@ -1050,45 +1228,37 @@ namespace StockDataServer
 		
 		private string _EquityName;
 		
-		private double _Price;
+		private decimal _Price;
 		
-		private double _PrevClosePrice;
+		private decimal _PrevClosePrice;
 		
-		private double _HighPrice;
+		private decimal _HighPrice;
 		
-		private double _LowPrice;
+		private decimal _LowPrice;
 		
-		private double _OpenPrice;
+		private decimal _OpenPrice;
 		
-		private double _Volume;
+		private long _Volume;
 		
-		private double _Change;
+		private decimal _Change;
 		
-		private double _MarketCap;
+		private long _MarketCap;
 		
-		private double @__52_week_High;
+		private decimal @__52_week_High;
 		
-		private double @__52_week_Low;
+		private decimal @__52_week_Low;
 		
-		private double _AskPrice;
+		private decimal _AskPrice;
 		
-		private double _BidPrice;
+		private decimal _BidPrice;
 		
-		private double _AskSize;
+		private long _AskSize;
 		
-		private double _BidSize;
-		
-		private double @__1_Year_Return;
-		
-		private double _Beta;
-		
-		private double _PE_Ratio;
-		
-		private double _Dividend;
-		
-		private double _DividendPercent;
+		private long _BidSize;
 		
 		private int _UpdateChecker;
+		
+		private EntitySet<History> _Histories;
 		
 		private EntitySet<Portfolio> _Portfolios;
 		
@@ -1104,44 +1274,34 @@ namespace StockDataServer
     partial void OnTickerChanged();
     partial void OnEquityNameChanging(string value);
     partial void OnEquityNameChanged();
-    partial void OnPriceChanging(double value);
+    partial void OnPriceChanging(decimal value);
     partial void OnPriceChanged();
-    partial void OnPrevClosePriceChanging(double value);
+    partial void OnPrevClosePriceChanging(decimal value);
     partial void OnPrevClosePriceChanged();
-    partial void OnHighPriceChanging(double value);
+    partial void OnHighPriceChanging(decimal value);
     partial void OnHighPriceChanged();
-    partial void OnLowPriceChanging(double value);
+    partial void OnLowPriceChanging(decimal value);
     partial void OnLowPriceChanged();
-    partial void OnOpenPriceChanging(double value);
+    partial void OnOpenPriceChanging(decimal value);
     partial void OnOpenPriceChanged();
-    partial void OnVolumeChanging(double value);
+    partial void OnVolumeChanging(long value);
     partial void OnVolumeChanged();
-    partial void OnChangeChanging(double value);
+    partial void OnChangeChanging(decimal value);
     partial void OnChangeChanged();
-    partial void OnMarketCapChanging(double value);
+    partial void OnMarketCapChanging(long value);
     partial void OnMarketCapChanged();
-    partial void On_52_week_HighChanging(double value);
+    partial void On_52_week_HighChanging(decimal value);
     partial void On_52_week_HighChanged();
-    partial void On_52_week_LowChanging(double value);
+    partial void On_52_week_LowChanging(decimal value);
     partial void On_52_week_LowChanged();
-    partial void OnAskPriceChanging(double value);
+    partial void OnAskPriceChanging(decimal value);
     partial void OnAskPriceChanged();
-    partial void OnBidPriceChanging(double value);
+    partial void OnBidPriceChanging(decimal value);
     partial void OnBidPriceChanged();
-    partial void OnAskSizeChanging(double value);
+    partial void OnAskSizeChanging(long value);
     partial void OnAskSizeChanged();
-    partial void OnBidSizeChanging(double value);
+    partial void OnBidSizeChanging(long value);
     partial void OnBidSizeChanged();
-    partial void On_1_Year_ReturnChanging(double value);
-    partial void On_1_Year_ReturnChanged();
-    partial void OnBetaChanging(double value);
-    partial void OnBetaChanged();
-    partial void OnPE_RatioChanging(double value);
-    partial void OnPE_RatioChanged();
-    partial void OnDividendChanging(double value);
-    partial void OnDividendChanged();
-    partial void OnDividendPercentChanging(double value);
-    partial void OnDividendPercentChanged();
     partial void OnUpdateCheckerChanging(int value);
     partial void OnUpdateCheckerChanged();
     #endregion
@@ -1193,9 +1353,9 @@ namespace StockDataServer
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Price", DbType="Float NOT NULL")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Price", DbType="Decimal(20,2) NOT NULL")]
 		[global::System.Runtime.Serialization.DataMemberAttribute(Order=3)]
-		public double Price
+		public decimal Price
 		{
 			get
 			{
@@ -1214,9 +1374,9 @@ namespace StockDataServer
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PrevClosePrice", DbType="Float NOT NULL")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PrevClosePrice", DbType="Decimal(20,2) NOT NULL")]
 		[global::System.Runtime.Serialization.DataMemberAttribute(Order=4)]
-		public double PrevClosePrice
+		public decimal PrevClosePrice
 		{
 			get
 			{
@@ -1235,9 +1395,9 @@ namespace StockDataServer
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_HighPrice", DbType="Float NOT NULL")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_HighPrice", DbType="Decimal(20,2) NOT NULL")]
 		[global::System.Runtime.Serialization.DataMemberAttribute(Order=5)]
-		public double HighPrice
+		public decimal HighPrice
 		{
 			get
 			{
@@ -1256,9 +1416,9 @@ namespace StockDataServer
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LowPrice", DbType="Float NOT NULL")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LowPrice", DbType="Decimal(20,2) NOT NULL")]
 		[global::System.Runtime.Serialization.DataMemberAttribute(Order=6)]
-		public double LowPrice
+		public decimal LowPrice
 		{
 			get
 			{
@@ -1277,9 +1437,9 @@ namespace StockDataServer
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OpenPrice", DbType="Float NOT NULL")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OpenPrice", DbType="Decimal(20,2) NOT NULL")]
 		[global::System.Runtime.Serialization.DataMemberAttribute(Order=7)]
-		public double OpenPrice
+		public decimal OpenPrice
 		{
 			get
 			{
@@ -1298,9 +1458,9 @@ namespace StockDataServer
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Volume", DbType="Float NOT NULL")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Volume", DbType="BigInt NOT NULL")]
 		[global::System.Runtime.Serialization.DataMemberAttribute(Order=8)]
-		public double Volume
+		public long Volume
 		{
 			get
 			{
@@ -1319,9 +1479,9 @@ namespace StockDataServer
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Change", DbType="Float NOT NULL")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Change", DbType="Decimal(20,2) NOT NULL")]
 		[global::System.Runtime.Serialization.DataMemberAttribute(Order=9)]
-		public double Change
+		public decimal Change
 		{
 			get
 			{
@@ -1340,9 +1500,9 @@ namespace StockDataServer
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MarketCap", DbType="Float NOT NULL")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MarketCap", DbType="BigInt NOT NULL")]
 		[global::System.Runtime.Serialization.DataMemberAttribute(Order=10)]
-		public double MarketCap
+		public long MarketCap
 		{
 			get
 			{
@@ -1361,9 +1521,9 @@ namespace StockDataServer
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Name="[52-week_High]", Storage="__52_week_High", DbType="Float NOT NULL")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Name="[52-week_High]", Storage="__52_week_High", DbType="Decimal(20,2) NOT NULL")]
 		[global::System.Runtime.Serialization.DataMemberAttribute(Order=11)]
-		public double _52_week_High
+		public decimal _52_week_High
 		{
 			get
 			{
@@ -1382,9 +1542,9 @@ namespace StockDataServer
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Name="[52-week_Low]", Storage="__52_week_Low", DbType="Float NOT NULL")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Name="[52-week_Low]", Storage="__52_week_Low", DbType="Decimal(20,2) NOT NULL")]
 		[global::System.Runtime.Serialization.DataMemberAttribute(Order=12)]
-		public double _52_week_Low
+		public decimal _52_week_Low
 		{
 			get
 			{
@@ -1403,9 +1563,9 @@ namespace StockDataServer
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_AskPrice", DbType="Float NOT NULL")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_AskPrice", DbType="Decimal(20,2) NOT NULL")]
 		[global::System.Runtime.Serialization.DataMemberAttribute(Order=13)]
-		public double AskPrice
+		public decimal AskPrice
 		{
 			get
 			{
@@ -1424,9 +1584,9 @@ namespace StockDataServer
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_BidPrice", DbType="Float NOT NULL")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_BidPrice", DbType="Decimal(20,2) NOT NULL")]
 		[global::System.Runtime.Serialization.DataMemberAttribute(Order=14)]
-		public double BidPrice
+		public decimal BidPrice
 		{
 			get
 			{
@@ -1445,9 +1605,9 @@ namespace StockDataServer
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_AskSize", DbType="Float NOT NULL")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_AskSize", DbType="BigInt NOT NULL")]
 		[global::System.Runtime.Serialization.DataMemberAttribute(Order=15)]
-		public double AskSize
+		public long AskSize
 		{
 			get
 			{
@@ -1466,9 +1626,9 @@ namespace StockDataServer
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_BidSize", DbType="Float NOT NULL")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_BidSize", DbType="BigInt NOT NULL")]
 		[global::System.Runtime.Serialization.DataMemberAttribute(Order=16)]
-		public double BidSize
+		public long BidSize
 		{
 			get
 			{
@@ -1487,113 +1647,8 @@ namespace StockDataServer
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Name="[1-Year_Return]", Storage="__1_Year_Return", DbType="Float NOT NULL")]
-		[global::System.Runtime.Serialization.DataMemberAttribute(Order=17)]
-		public double _1_Year_Return
-		{
-			get
-			{
-				return this.@__1_Year_Return;
-			}
-			set
-			{
-				if ((this.@__1_Year_Return != value))
-				{
-					this.On_1_Year_ReturnChanging(value);
-					this.SendPropertyChanging();
-					this.@__1_Year_Return = value;
-					this.SendPropertyChanged("_1_Year_Return");
-					this.On_1_Year_ReturnChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Beta", DbType="Float NOT NULL")]
-		[global::System.Runtime.Serialization.DataMemberAttribute(Order=18)]
-		public double Beta
-		{
-			get
-			{
-				return this._Beta;
-			}
-			set
-			{
-				if ((this._Beta != value))
-				{
-					this.OnBetaChanging(value);
-					this.SendPropertyChanging();
-					this._Beta = value;
-					this.SendPropertyChanged("Beta");
-					this.OnBetaChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PE_Ratio", DbType="Float NOT NULL")]
-		[global::System.Runtime.Serialization.DataMemberAttribute(Order=19)]
-		public double PE_Ratio
-		{
-			get
-			{
-				return this._PE_Ratio;
-			}
-			set
-			{
-				if ((this._PE_Ratio != value))
-				{
-					this.OnPE_RatioChanging(value);
-					this.SendPropertyChanging();
-					this._PE_Ratio = value;
-					this.SendPropertyChanged("PE_Ratio");
-					this.OnPE_RatioChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Dividend", DbType="Float NOT NULL")]
-		[global::System.Runtime.Serialization.DataMemberAttribute(Order=20)]
-		public double Dividend
-		{
-			get
-			{
-				return this._Dividend;
-			}
-			set
-			{
-				if ((this._Dividend != value))
-				{
-					this.OnDividendChanging(value);
-					this.SendPropertyChanging();
-					this._Dividend = value;
-					this.SendPropertyChanged("Dividend");
-					this.OnDividendChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DividendPercent", DbType="Float NOT NULL")]
-		[global::System.Runtime.Serialization.DataMemberAttribute(Order=21)]
-		public double DividendPercent
-		{
-			get
-			{
-				return this._DividendPercent;
-			}
-			set
-			{
-				if ((this._DividendPercent != value))
-				{
-					this.OnDividendPercentChanging(value);
-					this.SendPropertyChanging();
-					this._DividendPercent = value;
-					this.SendPropertyChanged("DividendPercent");
-					this.OnDividendPercentChanged();
-				}
-			}
-		}
-		
 		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UpdateChecker", AutoSync=AutoSync.Always, DbType="Int NOT NULL IDENTITY", IsDbGenerated=true)]
-		[global::System.Runtime.Serialization.DataMemberAttribute(Order=22)]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=17)]
 		public int UpdateChecker
 		{
 			get
@@ -1613,8 +1668,27 @@ namespace StockDataServer
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Stock_History", Storage="_Histories", ThisKey="Ticker", OtherKey="Ticker")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=18, EmitDefaultValue=false)]
+		public EntitySet<History> Histories
+		{
+			get
+			{
+				if ((this.serializing 
+							&& (this._Histories.HasLoadedOrAssignedValues == false)))
+				{
+					return null;
+				}
+				return this._Histories;
+			}
+			set
+			{
+				this._Histories.Assign(value);
+			}
+		}
+		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Stock_Portfolio", Storage="_Portfolios", ThisKey="Ticker", OtherKey="Ticker")]
-		[global::System.Runtime.Serialization.DataMemberAttribute(Order=23, EmitDefaultValue=false)]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=19, EmitDefaultValue=false)]
 		public EntitySet<Portfolio> Portfolios
 		{
 			get
@@ -1633,7 +1707,7 @@ namespace StockDataServer
 		}
 		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Stock_WatchStock", Storage="_WatchStocks", ThisKey="Ticker", OtherKey="Ticker")]
-		[global::System.Runtime.Serialization.DataMemberAttribute(Order=24, EmitDefaultValue=false)]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=20, EmitDefaultValue=false)]
 		public EntitySet<WatchStock> WatchStocks
 		{
 			get
@@ -1671,6 +1745,18 @@ namespace StockDataServer
 			}
 		}
 		
+		private void attach_Histories(History entity)
+		{
+			this.SendPropertyChanging();
+			entity.Stock = this;
+		}
+		
+		private void detach_Histories(History entity)
+		{
+			this.SendPropertyChanging();
+			entity.Stock = null;
+		}
+		
 		private void attach_Portfolios(Portfolio entity)
 		{
 			this.SendPropertyChanging();
@@ -1697,6 +1783,7 @@ namespace StockDataServer
 		
 		private void Initialize()
 		{
+			this._Histories = new EntitySet<History>(new Action<History>(this.attach_Histories), new Action<History>(this.detach_Histories));
 			this._Portfolios = new EntitySet<Portfolio>(new Action<Portfolio>(this.attach_Portfolios), new Action<Portfolio>(this.detach_Portfolios));
 			this._WatchStocks = new EntitySet<WatchStock>(new Action<WatchStock>(this.attach_WatchStocks), new Action<WatchStock>(this.detach_WatchStocks));
 			OnCreated();
@@ -1724,7 +1811,7 @@ namespace StockDataServer
 		}
 	}
 	
-	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Transactions")]
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.[Transaction]")]
 	[global::System.Runtime.Serialization.DataContractAttribute()]
 	public partial class Transaction : INotifyPropertyChanging, INotifyPropertyChanged
 	{
@@ -1745,13 +1832,11 @@ namespace StockDataServer
 		
 		private long _NumStocks;
 		
-		private double _Price;
+		private decimal _Price;
 		
-		private double _AvgBuyPrice;
+		private System.Nullable<decimal> _GainLossMoney;
 		
-		private System.Nullable<double> _GainLossMoney;
-		
-		private System.Nullable<double> _GainLossPercent;
+		private System.Nullable<decimal> _GainLossPercent;
 		
 		private EntityRef<Account> _Account;
 		
@@ -1773,13 +1858,11 @@ namespace StockDataServer
     partial void OnTypeChanged();
     partial void OnNumStocksChanging(long value);
     partial void OnNumStocksChanged();
-    partial void OnPriceChanging(double value);
+    partial void OnPriceChanging(decimal value);
     partial void OnPriceChanged();
-    partial void OnAvgBuyPriceChanging(double value);
-    partial void OnAvgBuyPriceChanged();
-    partial void OnGainLossMoneyChanging(System.Nullable<double> value);
+    partial void OnGainLossMoneyChanging(System.Nullable<decimal> value);
     partial void OnGainLossMoneyChanged();
-    partial void OnGainLossPercentChanging(System.Nullable<double> value);
+    partial void OnGainLossPercentChanging(System.Nullable<decimal> value);
     partial void OnGainLossPercentChanged();
     #endregion
 		
@@ -1939,9 +2022,9 @@ namespace StockDataServer
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Price", DbType="Float NOT NULL")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Price", DbType="Decimal(20,2) NOT NULL")]
 		[global::System.Runtime.Serialization.DataMemberAttribute(Order=8)]
-		public double Price
+		public decimal Price
 		{
 			get
 			{
@@ -1960,30 +2043,9 @@ namespace StockDataServer
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_AvgBuyPrice", DbType="Float NOT NULL")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_GainLossMoney", DbType="Decimal(20,2)")]
 		[global::System.Runtime.Serialization.DataMemberAttribute(Order=9)]
-		public double AvgBuyPrice
-		{
-			get
-			{
-				return this._AvgBuyPrice;
-			}
-			set
-			{
-				if ((this._AvgBuyPrice != value))
-				{
-					this.OnAvgBuyPriceChanging(value);
-					this.SendPropertyChanging();
-					this._AvgBuyPrice = value;
-					this.SendPropertyChanged("AvgBuyPrice");
-					this.OnAvgBuyPriceChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_GainLossMoney", DbType="Float")]
-		[global::System.Runtime.Serialization.DataMemberAttribute(Order=10)]
-		public System.Nullable<double> GainLossMoney
+		public System.Nullable<decimal> GainLossMoney
 		{
 			get
 			{
@@ -2002,9 +2064,9 @@ namespace StockDataServer
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_GainLossPercent", DbType="Float")]
-		[global::System.Runtime.Serialization.DataMemberAttribute(Order=11)]
-		public System.Nullable<double> GainLossPercent
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_GainLossPercent", DbType="Decimal(20,2)")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=10)]
+		public System.Nullable<decimal> GainLossPercent
 		{
 			get
 			{
