@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StockDataServer.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -7,9 +8,61 @@ using System.Web.Http;
 
 namespace StockDataServer.Controllers
 {
-    public class BuyController : ApiController
+    public class TransactionController : ApiController
     {
         const string BUY = "Buy";
+
+        [HttpGet]
+        public List<TransactionsTabModel> GetTransactionsByUserName(string username)
+        {
+            DBStockTrainerDataContext db = new DBStockTrainerDataContext();
+
+            return (from t in db.GetTable<Transaction>()
+                    from a in db.GetTable<Account>()
+                    where ((t.Username == username) && (t.Username == a.Username))
+                    select new TransactionsTabModel
+                    {
+                        Ticker = t.Ticker,
+                        EquityName = t.EquityName,
+                        Date = t.Date,
+                        Type = t.Type,
+                        NumStocks = t.NumStocks,
+                        Price = t.Price,
+                        GainLossMoney = t.GainLossMoney,
+                        GainLossPercent = t.GainLossPercent
+                    }).ToList();
+        }
+
+        [HttpPost]
+        public bool InsertNewTransaction(string ticker, string equityName, 
+                                         DateTime date, string type,
+                                         long numStocks, decimal price,
+                                         decimal gainLossMoney,
+                                         decimal gainLossPercent)
+        {
+            try
+            {
+                DBStockTrainerDataContext db = new DBStockTrainerDataContext();
+
+                Transaction transaction = new Transaction();
+                transaction.Ticker = ticker;
+                transaction.EquityName = equityName;
+                transaction.Date = date;
+                transaction.Type = type;
+                transaction.NumStocks = numStocks;
+                transaction.Price = price;
+                transaction.GainLossMoney = gainLossMoney;
+                transaction.GainLossPercent = gainLossPercent;
+
+                db.Transactions.InsertOnSubmit(transaction);
+                db.SubmitChanges();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
 
         [HttpPost]
         public bool Buy(string username, string ticker, long numStocks)
@@ -17,8 +70,8 @@ namespace StockDataServer.Controllers
             DBStockTrainerDataContext db = new DBStockTrainerDataContext();
 
             var matchedStock = (from s in db.GetTable<Stock>()
-                                 where s.Ticker == ticker
-                                 select s).SingleOrDefault();
+                                where s.Ticker == ticker
+                                select s).SingleOrDefault();
 
             if (matchedStock != null)
             {
