@@ -31,9 +31,6 @@ namespace StockDataServer
 		
     #region Extensibility Method Definitions
     partial void OnCreated();
-    partial void InsertAccount(Account instance);
-    partial void UpdateAccount(Account instance);
-    partial void DeleteAccount(Account instance);
     partial void InsertHistory(History instance);
     partial void UpdateHistory(History instance);
     partial void DeleteHistory(History instance);
@@ -52,6 +49,9 @@ namespace StockDataServer
     partial void InsertWatchStock(WatchStock instance);
     partial void UpdateWatchStock(WatchStock instance);
     partial void DeleteWatchStock(WatchStock instance);
+    partial void InsertAccount(Account instance);
+    partial void UpdateAccount(Account instance);
+    partial void DeleteAccount(Account instance);
     #endregion
 		
 		public DBStockTrainerDataContext() : 
@@ -82,14 +82,6 @@ namespace StockDataServer
 				base(connection, mappingSource)
 		{
 			OnCreated();
-		}
-		
-		public System.Data.Linq.Table<Account> Accounts
-		{
-			get
-			{
-				return this.GetTable<Account>();
-			}
 		}
 		
 		public System.Data.Linq.Table<History> Histories
@@ -147,349 +139,13 @@ namespace StockDataServer
 				return this.GetTable<WatchStock>();
 			}
 		}
-	}
-	
-	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Account")]
-	[global::System.Runtime.Serialization.DataContractAttribute()]
-	public partial class Account : INotifyPropertyChanging, INotifyPropertyChanged
-	{
 		
-		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
-		
-		private string _Username;
-		
-		private string _Password;
-		
-		private decimal _StartingInvestment;
-		
-		private decimal _AvailableCash;
-		
-		private long _TotalTrans;
-		
-		private long _PositiveTrans;
-		
-		private long _NegativeTrans;
-		
-		private EntitySet<Portfolio> _Portfolios;
-		
-		private EntitySet<Transaction> _Transactions;
-		
-		private EntitySet<WatchStock> _WatchStocks;
-		
-		private bool serializing;
-		
-    #region Extensibility Method Definitions
-    partial void OnLoaded();
-    partial void OnValidate(System.Data.Linq.ChangeAction action);
-    partial void OnCreated();
-    partial void OnUsernameChanging(string value);
-    partial void OnUsernameChanged();
-    partial void OnPasswordChanging(string value);
-    partial void OnPasswordChanged();
-    partial void OnStartingInvestmentChanging(decimal value);
-    partial void OnStartingInvestmentChanged();
-    partial void OnAvailableCashChanging(decimal value);
-    partial void OnAvailableCashChanged();
-    partial void OnTotalTransChanging(long value);
-    partial void OnTotalTransChanged();
-    partial void OnPositiveTransChanging(long value);
-    partial void OnPositiveTransChanged();
-    partial void OnNegativeTransChanging(long value);
-    partial void OnNegativeTransChanged();
-    #endregion
-		
-		public Account()
-		{
-			this.Initialize();
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Username", DbType="VarChar(50) NOT NULL", CanBeNull=false, IsPrimaryKey=true)]
-		[global::System.Runtime.Serialization.DataMemberAttribute(Order=1)]
-		public string Username
+		public System.Data.Linq.Table<Account> Accounts
 		{
 			get
 			{
-				return this._Username;
+				return this.GetTable<Account>();
 			}
-			set
-			{
-				if ((this._Username != value))
-				{
-					this.OnUsernameChanging(value);
-					this.SendPropertyChanging();
-					this._Username = value;
-					this.SendPropertyChanged("Username");
-					this.OnUsernameChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Password", DbType="VarChar(50) NOT NULL", CanBeNull=false)]
-		[global::System.Runtime.Serialization.DataMemberAttribute(Order=2)]
-		public string Password
-		{
-			get
-			{
-				return this._Password;
-			}
-			set
-			{
-				if ((this._Password != value))
-				{
-					this.OnPasswordChanging(value);
-					this.SendPropertyChanging();
-					this._Password = value;
-					this.SendPropertyChanged("Password");
-					this.OnPasswordChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_StartingInvestment", DbType="Decimal(20,2) NOT NULL")]
-		[global::System.Runtime.Serialization.DataMemberAttribute(Order=3)]
-		public decimal StartingInvestment
-		{
-			get
-			{
-				return this._StartingInvestment;
-			}
-			set
-			{
-				if ((this._StartingInvestment != value))
-				{
-					this.OnStartingInvestmentChanging(value);
-					this.SendPropertyChanging();
-					this._StartingInvestment = value;
-					this.SendPropertyChanged("StartingInvestment");
-					this.OnStartingInvestmentChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_AvailableCash", DbType="Decimal(20,2) NOT NULL")]
-		[global::System.Runtime.Serialization.DataMemberAttribute(Order=4)]
-		public decimal AvailableCash
-		{
-			get
-			{
-				return this._AvailableCash;
-			}
-			set
-			{
-				if ((this._AvailableCash != value))
-				{
-					this.OnAvailableCashChanging(value);
-					this.SendPropertyChanging();
-					this._AvailableCash = value;
-					this.SendPropertyChanged("AvailableCash");
-					this.OnAvailableCashChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_TotalTrans", DbType="BigInt NOT NULL")]
-		[global::System.Runtime.Serialization.DataMemberAttribute(Order=5)]
-		public long TotalTrans
-		{
-			get
-			{
-				return this._TotalTrans;
-			}
-			set
-			{
-				if ((this._TotalTrans != value))
-				{
-					this.OnTotalTransChanging(value);
-					this.SendPropertyChanging();
-					this._TotalTrans = value;
-					this.SendPropertyChanged("TotalTrans");
-					this.OnTotalTransChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PositiveTrans", DbType="BigInt NOT NULL")]
-		[global::System.Runtime.Serialization.DataMemberAttribute(Order=6)]
-		public long PositiveTrans
-		{
-			get
-			{
-				return this._PositiveTrans;
-			}
-			set
-			{
-				if ((this._PositiveTrans != value))
-				{
-					this.OnPositiveTransChanging(value);
-					this.SendPropertyChanging();
-					this._PositiveTrans = value;
-					this.SendPropertyChanged("PositiveTrans");
-					this.OnPositiveTransChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_NegativeTrans", DbType="BigInt NOT NULL")]
-		[global::System.Runtime.Serialization.DataMemberAttribute(Order=7)]
-		public long NegativeTrans
-		{
-			get
-			{
-				return this._NegativeTrans;
-			}
-			set
-			{
-				if ((this._NegativeTrans != value))
-				{
-					this.OnNegativeTransChanging(value);
-					this.SendPropertyChanging();
-					this._NegativeTrans = value;
-					this.SendPropertyChanged("NegativeTrans");
-					this.OnNegativeTransChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_Portfolio", Storage="_Portfolios", ThisKey="Username", OtherKey="Username")]
-		[global::System.Runtime.Serialization.DataMemberAttribute(Order=8, EmitDefaultValue=false)]
-		public EntitySet<Portfolio> Portfolios
-		{
-			get
-			{
-				if ((this.serializing 
-							&& (this._Portfolios.HasLoadedOrAssignedValues == false)))
-				{
-					return null;
-				}
-				return this._Portfolios;
-			}
-			set
-			{
-				this._Portfolios.Assign(value);
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_Transaction", Storage="_Transactions", ThisKey="Username", OtherKey="Username")]
-		[global::System.Runtime.Serialization.DataMemberAttribute(Order=9, EmitDefaultValue=false)]
-		public EntitySet<Transaction> Transactions
-		{
-			get
-			{
-				if ((this.serializing 
-							&& (this._Transactions.HasLoadedOrAssignedValues == false)))
-				{
-					return null;
-				}
-				return this._Transactions;
-			}
-			set
-			{
-				this._Transactions.Assign(value);
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_WatchStock", Storage="_WatchStocks", ThisKey="Username", OtherKey="Username")]
-		[global::System.Runtime.Serialization.DataMemberAttribute(Order=10, EmitDefaultValue=false)]
-		public EntitySet<WatchStock> WatchStocks
-		{
-			get
-			{
-				if ((this.serializing 
-							&& (this._WatchStocks.HasLoadedOrAssignedValues == false)))
-				{
-					return null;
-				}
-				return this._WatchStocks;
-			}
-			set
-			{
-				this._WatchStocks.Assign(value);
-			}
-		}
-		
-		public event PropertyChangingEventHandler PropertyChanging;
-		
-		public event PropertyChangedEventHandler PropertyChanged;
-		
-		protected virtual void SendPropertyChanging()
-		{
-			if ((this.PropertyChanging != null))
-			{
-				this.PropertyChanging(this, emptyChangingEventArgs);
-			}
-		}
-		
-		protected virtual void SendPropertyChanged(String propertyName)
-		{
-			if ((this.PropertyChanged != null))
-			{
-				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-			}
-		}
-		
-		private void attach_Portfolios(Portfolio entity)
-		{
-			this.SendPropertyChanging();
-			entity.Account = this;
-		}
-		
-		private void detach_Portfolios(Portfolio entity)
-		{
-			this.SendPropertyChanging();
-			entity.Account = null;
-		}
-		
-		private void attach_Transactions(Transaction entity)
-		{
-			this.SendPropertyChanging();
-			entity.Account = this;
-		}
-		
-		private void detach_Transactions(Transaction entity)
-		{
-			this.SendPropertyChanging();
-			entity.Account = null;
-		}
-		
-		private void attach_WatchStocks(WatchStock entity)
-		{
-			this.SendPropertyChanging();
-			entity.Account = this;
-		}
-		
-		private void detach_WatchStocks(WatchStock entity)
-		{
-			this.SendPropertyChanging();
-			entity.Account = null;
-		}
-		
-		private void Initialize()
-		{
-			this._Portfolios = new EntitySet<Portfolio>(new Action<Portfolio>(this.attach_Portfolios), new Action<Portfolio>(this.detach_Portfolios));
-			this._Transactions = new EntitySet<Transaction>(new Action<Transaction>(this.attach_Transactions), new Action<Transaction>(this.detach_Transactions));
-			this._WatchStocks = new EntitySet<WatchStock>(new Action<WatchStock>(this.attach_WatchStocks), new Action<WatchStock>(this.detach_WatchStocks));
-			OnCreated();
-		}
-		
-		[global::System.Runtime.Serialization.OnDeserializingAttribute()]
-		[global::System.ComponentModel.EditorBrowsableAttribute(EditorBrowsableState.Never)]
-		public void OnDeserializing(StreamingContext context)
-		{
-			this.Initialize();
-		}
-		
-		[global::System.Runtime.Serialization.OnSerializingAttribute()]
-		[global::System.ComponentModel.EditorBrowsableAttribute(EditorBrowsableState.Never)]
-		public void OnSerializing(StreamingContext context)
-		{
-			this.serializing = true;
-		}
-		
-		[global::System.Runtime.Serialization.OnSerializedAttribute()]
-		[global::System.ComponentModel.EditorBrowsableAttribute(EditorBrowsableState.Never)]
-		public void OnSerialized(StreamingContext context)
-		{
-			this.serializing = false;
 		}
 	}
 	
@@ -951,9 +607,9 @@ namespace StockDataServer
 		
 		private long _NumStocks;
 		
-		private EntityRef<Account> _Account;
-		
 		private EntityRef<Stock> _Stock;
+		
+		private EntityRef<Account> _Account;
 		
     #region Extensibility Method Definitions
     partial void OnLoaded();
@@ -1066,40 +722,6 @@ namespace StockDataServer
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_Portfolio", Storage="_Account", ThisKey="Username", OtherKey="Username", IsForeignKey=true)]
-		public Account Account
-		{
-			get
-			{
-				return this._Account.Entity;
-			}
-			set
-			{
-				Account previousValue = this._Account.Entity;
-				if (((previousValue != value) 
-							|| (this._Account.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._Account.Entity = null;
-						previousValue.Portfolios.Remove(this);
-					}
-					this._Account.Entity = value;
-					if ((value != null))
-					{
-						value.Portfolios.Add(this);
-						this._Username = value.Username;
-					}
-					else
-					{
-						this._Username = default(string);
-					}
-					this.SendPropertyChanged("Account");
-				}
-			}
-		}
-		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Stock_Portfolio", Storage="_Stock", ThisKey="Ticker", OtherKey="Ticker", IsForeignKey=true)]
 		public Stock Stock
 		{
@@ -1134,6 +756,40 @@ namespace StockDataServer
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_Portfolio", Storage="_Account", ThisKey="Username", OtherKey="Username", IsForeignKey=true)]
+		public Account Account
+		{
+			get
+			{
+				return this._Account.Entity;
+			}
+			set
+			{
+				Account previousValue = this._Account.Entity;
+				if (((previousValue != value) 
+							|| (this._Account.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Account.Entity = null;
+						previousValue.Portfolios.Remove(this);
+					}
+					this._Account.Entity = value;
+					if ((value != null))
+					{
+						value.Portfolios.Add(this);
+						this._Username = value.Username;
+					}
+					else
+					{
+						this._Username = default(string);
+					}
+					this.SendPropertyChanged("Account");
+				}
+			}
+		}
+		
 		public event PropertyChangingEventHandler PropertyChanging;
 		
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -1156,8 +812,8 @@ namespace StockDataServer
 		
 		private void Initialize()
 		{
-			this._Account = default(EntityRef<Account>);
 			this._Stock = default(EntityRef<Stock>);
+			this._Account = default(EntityRef<Account>);
 			OnCreated();
 		}
 		
@@ -2164,9 +1820,9 @@ namespace StockDataServer
 		
 		private string _Ticker;
 		
-		private EntityRef<Account> _Account;
-		
 		private EntityRef<Stock> _Stock;
+		
+		private EntityRef<Account> _Account;
 		
     #region Extensibility Method Definitions
     partial void OnLoaded();
@@ -2233,40 +1889,6 @@ namespace StockDataServer
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_WatchStock", Storage="_Account", ThisKey="Username", OtherKey="Username", IsForeignKey=true)]
-		public Account Account
-		{
-			get
-			{
-				return this._Account.Entity;
-			}
-			set
-			{
-				Account previousValue = this._Account.Entity;
-				if (((previousValue != value) 
-							|| (this._Account.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._Account.Entity = null;
-						previousValue.WatchStocks.Remove(this);
-					}
-					this._Account.Entity = value;
-					if ((value != null))
-					{
-						value.WatchStocks.Add(this);
-						this._Username = value.Username;
-					}
-					else
-					{
-						this._Username = default(string);
-					}
-					this.SendPropertyChanged("Account");
-				}
-			}
-		}
-		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Stock_WatchStock", Storage="_Stock", ThisKey="Ticker", OtherKey="Ticker", IsForeignKey=true)]
 		public Stock Stock
 		{
@@ -2301,6 +1923,40 @@ namespace StockDataServer
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_WatchStock", Storage="_Account", ThisKey="Username", OtherKey="Username", IsForeignKey=true)]
+		public Account Account
+		{
+			get
+			{
+				return this._Account.Entity;
+			}
+			set
+			{
+				Account previousValue = this._Account.Entity;
+				if (((previousValue != value) 
+							|| (this._Account.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Account.Entity = null;
+						previousValue.WatchStocks.Remove(this);
+					}
+					this._Account.Entity = value;
+					if ((value != null))
+					{
+						value.WatchStocks.Add(this);
+						this._Username = value.Username;
+					}
+					else
+					{
+						this._Username = default(string);
+					}
+					this.SendPropertyChanged("Account");
+				}
+			}
+		}
+		
 		public event PropertyChangingEventHandler PropertyChanging;
 		
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -2323,8 +1979,8 @@ namespace StockDataServer
 		
 		private void Initialize()
 		{
-			this._Account = default(EntityRef<Account>);
 			this._Stock = default(EntityRef<Stock>);
+			this._Account = default(EntityRef<Account>);
 			OnCreated();
 		}
 		
@@ -2333,6 +1989,475 @@ namespace StockDataServer
 		public void OnDeserializing(StreamingContext context)
 		{
 			this.Initialize();
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Account")]
+	[global::System.Runtime.Serialization.DataContractAttribute()]
+	public partial class Account : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private string _Username;
+		
+		private string _Password;
+		
+		private string _Fullname;
+		
+		private string _FirstSecurityQuestion;
+		
+		private string _FirstSecurityAnswer;
+		
+		private string _SecondSecurityQuestion;
+		
+		private string _SecondSecurityAnswer;
+		
+		private decimal _StartingInvestment;
+		
+		private decimal _AvailableCash;
+		
+		private long _TotalTrans;
+		
+		private long _PositiveTrans;
+		
+		private long _NegativeTrans;
+		
+		private EntitySet<Portfolio> _Portfolios;
+		
+		private EntitySet<Transaction> _Transactions;
+		
+		private EntitySet<WatchStock> _WatchStocks;
+		
+		private bool serializing;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnUsernameChanging(string value);
+    partial void OnUsernameChanged();
+    partial void OnPasswordChanging(string value);
+    partial void OnPasswordChanged();
+    partial void OnFullnameChanging(string value);
+    partial void OnFullnameChanged();
+    partial void OnFirstSecurityQuestionChanging(string value);
+    partial void OnFirstSecurityQuestionChanged();
+    partial void OnFirstSecurityAnswerChanging(string value);
+    partial void OnFirstSecurityAnswerChanged();
+    partial void OnSecondSecurityQuestionChanging(string value);
+    partial void OnSecondSecurityQuestionChanged();
+    partial void OnSecondSecurityAnswerChanging(string value);
+    partial void OnSecondSecurityAnswerChanged();
+    partial void OnStartingInvestmentChanging(decimal value);
+    partial void OnStartingInvestmentChanged();
+    partial void OnAvailableCashChanging(decimal value);
+    partial void OnAvailableCashChanged();
+    partial void OnTotalTransChanging(long value);
+    partial void OnTotalTransChanged();
+    partial void OnPositiveTransChanging(long value);
+    partial void OnPositiveTransChanged();
+    partial void OnNegativeTransChanging(long value);
+    partial void OnNegativeTransChanged();
+    #endregion
+		
+		public Account()
+		{
+			this.Initialize();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Username", DbType="VarChar(50) NOT NULL", CanBeNull=false, IsPrimaryKey=true)]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=1)]
+		public string Username
+		{
+			get
+			{
+				return this._Username;
+			}
+			set
+			{
+				if ((this._Username != value))
+				{
+					this.OnUsernameChanging(value);
+					this.SendPropertyChanging();
+					this._Username = value;
+					this.SendPropertyChanged("Username");
+					this.OnUsernameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Password", DbType="VarChar(50) NOT NULL", CanBeNull=false)]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=2)]
+		public string Password
+		{
+			get
+			{
+				return this._Password;
+			}
+			set
+			{
+				if ((this._Password != value))
+				{
+					this.OnPasswordChanging(value);
+					this.SendPropertyChanging();
+					this._Password = value;
+					this.SendPropertyChanged("Password");
+					this.OnPasswordChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Fullname", DbType="VarChar(50) NOT NULL", CanBeNull=false)]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=3)]
+		public string Fullname
+		{
+			get
+			{
+				return this._Fullname;
+			}
+			set
+			{
+				if ((this._Fullname != value))
+				{
+					this.OnFullnameChanging(value);
+					this.SendPropertyChanging();
+					this._Fullname = value;
+					this.SendPropertyChanged("Fullname");
+					this.OnFullnameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FirstSecurityQuestion", DbType="VarChar(50) NOT NULL", CanBeNull=false)]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=4)]
+		public string FirstSecurityQuestion
+		{
+			get
+			{
+				return this._FirstSecurityQuestion;
+			}
+			set
+			{
+				if ((this._FirstSecurityQuestion != value))
+				{
+					this.OnFirstSecurityQuestionChanging(value);
+					this.SendPropertyChanging();
+					this._FirstSecurityQuestion = value;
+					this.SendPropertyChanged("FirstSecurityQuestion");
+					this.OnFirstSecurityQuestionChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FirstSecurityAnswer", DbType="VarChar(50) NOT NULL", CanBeNull=false)]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=5)]
+		public string FirstSecurityAnswer
+		{
+			get
+			{
+				return this._FirstSecurityAnswer;
+			}
+			set
+			{
+				if ((this._FirstSecurityAnswer != value))
+				{
+					this.OnFirstSecurityAnswerChanging(value);
+					this.SendPropertyChanging();
+					this._FirstSecurityAnswer = value;
+					this.SendPropertyChanged("FirstSecurityAnswer");
+					this.OnFirstSecurityAnswerChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SecondSecurityQuestion", DbType="VarChar(50) NOT NULL", CanBeNull=false)]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=6)]
+		public string SecondSecurityQuestion
+		{
+			get
+			{
+				return this._SecondSecurityQuestion;
+			}
+			set
+			{
+				if ((this._SecondSecurityQuestion != value))
+				{
+					this.OnSecondSecurityQuestionChanging(value);
+					this.SendPropertyChanging();
+					this._SecondSecurityQuestion = value;
+					this.SendPropertyChanged("SecondSecurityQuestion");
+					this.OnSecondSecurityQuestionChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SecondSecurityAnswer", DbType="VarChar(50) NOT NULL", CanBeNull=false)]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=7)]
+		public string SecondSecurityAnswer
+		{
+			get
+			{
+				return this._SecondSecurityAnswer;
+			}
+			set
+			{
+				if ((this._SecondSecurityAnswer != value))
+				{
+					this.OnSecondSecurityAnswerChanging(value);
+					this.SendPropertyChanging();
+					this._SecondSecurityAnswer = value;
+					this.SendPropertyChanged("SecondSecurityAnswer");
+					this.OnSecondSecurityAnswerChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_StartingInvestment", DbType="Decimal(20,2) NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=8)]
+		public decimal StartingInvestment
+		{
+			get
+			{
+				return this._StartingInvestment;
+			}
+			set
+			{
+				if ((this._StartingInvestment != value))
+				{
+					this.OnStartingInvestmentChanging(value);
+					this.SendPropertyChanging();
+					this._StartingInvestment = value;
+					this.SendPropertyChanged("StartingInvestment");
+					this.OnStartingInvestmentChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_AvailableCash", DbType="Decimal(20,2) NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=9)]
+		public decimal AvailableCash
+		{
+			get
+			{
+				return this._AvailableCash;
+			}
+			set
+			{
+				if ((this._AvailableCash != value))
+				{
+					this.OnAvailableCashChanging(value);
+					this.SendPropertyChanging();
+					this._AvailableCash = value;
+					this.SendPropertyChanged("AvailableCash");
+					this.OnAvailableCashChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_TotalTrans", DbType="BigInt NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=10)]
+		public long TotalTrans
+		{
+			get
+			{
+				return this._TotalTrans;
+			}
+			set
+			{
+				if ((this._TotalTrans != value))
+				{
+					this.OnTotalTransChanging(value);
+					this.SendPropertyChanging();
+					this._TotalTrans = value;
+					this.SendPropertyChanged("TotalTrans");
+					this.OnTotalTransChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PositiveTrans", DbType="BigInt NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=11)]
+		public long PositiveTrans
+		{
+			get
+			{
+				return this._PositiveTrans;
+			}
+			set
+			{
+				if ((this._PositiveTrans != value))
+				{
+					this.OnPositiveTransChanging(value);
+					this.SendPropertyChanging();
+					this._PositiveTrans = value;
+					this.SendPropertyChanged("PositiveTrans");
+					this.OnPositiveTransChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_NegativeTrans", DbType="BigInt NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=12)]
+		public long NegativeTrans
+		{
+			get
+			{
+				return this._NegativeTrans;
+			}
+			set
+			{
+				if ((this._NegativeTrans != value))
+				{
+					this.OnNegativeTransChanging(value);
+					this.SendPropertyChanging();
+					this._NegativeTrans = value;
+					this.SendPropertyChanged("NegativeTrans");
+					this.OnNegativeTransChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_Portfolio", Storage="_Portfolios", ThisKey="Username", OtherKey="Username")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=13, EmitDefaultValue=false)]
+		public EntitySet<Portfolio> Portfolios
+		{
+			get
+			{
+				if ((this.serializing 
+							&& (this._Portfolios.HasLoadedOrAssignedValues == false)))
+				{
+					return null;
+				}
+				return this._Portfolios;
+			}
+			set
+			{
+				this._Portfolios.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_Transaction", Storage="_Transactions", ThisKey="Username", OtherKey="Username")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=14, EmitDefaultValue=false)]
+		public EntitySet<Transaction> Transactions
+		{
+			get
+			{
+				if ((this.serializing 
+							&& (this._Transactions.HasLoadedOrAssignedValues == false)))
+				{
+					return null;
+				}
+				return this._Transactions;
+			}
+			set
+			{
+				this._Transactions.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_WatchStock", Storage="_WatchStocks", ThisKey="Username", OtherKey="Username")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=15, EmitDefaultValue=false)]
+		public EntitySet<WatchStock> WatchStocks
+		{
+			get
+			{
+				if ((this.serializing 
+							&& (this._WatchStocks.HasLoadedOrAssignedValues == false)))
+				{
+					return null;
+				}
+				return this._WatchStocks;
+			}
+			set
+			{
+				this._WatchStocks.Assign(value);
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void attach_Portfolios(Portfolio entity)
+		{
+			this.SendPropertyChanging();
+			entity.Account = this;
+		}
+		
+		private void detach_Portfolios(Portfolio entity)
+		{
+			this.SendPropertyChanging();
+			entity.Account = null;
+		}
+		
+		private void attach_Transactions(Transaction entity)
+		{
+			this.SendPropertyChanging();
+			entity.Account = this;
+		}
+		
+		private void detach_Transactions(Transaction entity)
+		{
+			this.SendPropertyChanging();
+			entity.Account = null;
+		}
+		
+		private void attach_WatchStocks(WatchStock entity)
+		{
+			this.SendPropertyChanging();
+			entity.Account = this;
+		}
+		
+		private void detach_WatchStocks(WatchStock entity)
+		{
+			this.SendPropertyChanging();
+			entity.Account = null;
+		}
+		
+		private void Initialize()
+		{
+			this._Portfolios = new EntitySet<Portfolio>(new Action<Portfolio>(this.attach_Portfolios), new Action<Portfolio>(this.detach_Portfolios));
+			this._Transactions = new EntitySet<Transaction>(new Action<Transaction>(this.attach_Transactions), new Action<Transaction>(this.detach_Transactions));
+			this._WatchStocks = new EntitySet<WatchStock>(new Action<WatchStock>(this.attach_WatchStocks), new Action<WatchStock>(this.detach_WatchStocks));
+			OnCreated();
+		}
+		
+		[global::System.Runtime.Serialization.OnDeserializingAttribute()]
+		[global::System.ComponentModel.EditorBrowsableAttribute(EditorBrowsableState.Never)]
+		public void OnDeserializing(StreamingContext context)
+		{
+			this.Initialize();
+		}
+		
+		[global::System.Runtime.Serialization.OnSerializingAttribute()]
+		[global::System.ComponentModel.EditorBrowsableAttribute(EditorBrowsableState.Never)]
+		public void OnSerializing(StreamingContext context)
+		{
+			this.serializing = true;
+		}
+		
+		[global::System.Runtime.Serialization.OnSerializedAttribute()]
+		[global::System.ComponentModel.EditorBrowsableAttribute(EditorBrowsableState.Never)]
+		public void OnSerialized(StreamingContext context)
+		{
+			this.serializing = false;
 		}
 	}
 }

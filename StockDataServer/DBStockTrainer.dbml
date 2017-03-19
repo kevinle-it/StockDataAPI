@@ -1,19 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?><Database Name="StockTrainer" Class="DBStockTrainerDataContext" Serialization="Unidirectional" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
   <Connection Mode="WebSettings" ConnectionString="Data Source=StockTrainer.mssql.somee.com;Initial Catalog=StockTrainer;Persist Security Info=False;User ID=lmtri1995_SQLLogin_1;Packet Size=4096;Workstation ID=StockTrainer.mssql.somee.com" SettingsObjectName="System.Configuration.ConfigurationManager.ConnectionStrings" SettingsPropertyName="StockTrainerConnectionString" Provider="System.Data.SqlClient" />
-  <Table Name="dbo.Account" Member="Accounts">
-    <Type Name="Account">
-      <Column Name="Username" Type="System.String" DbType="VarChar(50) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
-      <Column Name="Password" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
-      <Column Name="StartingInvestment" Type="System.Decimal" DbType="Decimal(20,2) NOT NULL" CanBeNull="false" />
-      <Column Name="AvailableCash" Type="System.Decimal" DbType="Decimal(20,2) NOT NULL" CanBeNull="false" />
-      <Column Name="TotalTrans" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
-      <Column Name="PositiveTrans" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
-      <Column Name="NegativeTrans" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
-      <Association Name="Account_Portfolio" Member="Portfolios" ThisKey="Username" OtherKey="Username" Type="Portfolio" />
-      <Association Name="Account_Transaction" Member="Transactions" ThisKey="Username" OtherKey="Username" Type="Transaction" />
-      <Association Name="Account_WatchStock" Member="WatchStocks" ThisKey="Username" OtherKey="Username" Type="WatchStock" />
-    </Type>
-  </Table>
   <Table Name="dbo.History" Member="Histories">
     <Type Name="History">
       <Column Name="Ticker" Type="System.String" DbType="VarChar(10) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
@@ -41,8 +27,8 @@
       <Column Name="Ticker" Type="System.String" DbType="VarChar(10) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
       <Column Name="Cost" Type="System.Decimal" DbType="Decimal(20,2) NOT NULL" CanBeNull="false" />
       <Column Name="NumStocks" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
-      <Association Name="Account_Portfolio" Member="Account" ThisKey="Username" OtherKey="Username" Type="Account" IsForeignKey="true" />
       <Association Name="Stock_Portfolio" Member="Stock" ThisKey="Ticker" OtherKey="Ticker" Type="Stock" IsForeignKey="true" />
+      <Association Name="Account_Portfolio" Member="Account" ThisKey="Username" OtherKey="Username" Type="Account" IsForeignKey="true" />
     </Type>
   </Table>
   <Table Name="dbo.Settings" Member="Settings">
@@ -94,8 +80,27 @@
     <Type Name="WatchStock">
       <Column Name="Username" Type="System.String" DbType="VarChar(50) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
       <Column Name="Ticker" Type="System.String" DbType="VarChar(10) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
-      <Association Name="Account_WatchStock" Member="Account" ThisKey="Username" OtherKey="Username" Type="Account" IsForeignKey="true" />
       <Association Name="Stock_WatchStock" Member="Stock" ThisKey="Ticker" OtherKey="Ticker" Type="Stock" IsForeignKey="true" />
+      <Association Name="Account_WatchStock" Member="Account" ThisKey="Username" OtherKey="Username" Type="Account" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Account" Member="Accounts">
+    <Type Name="Account">
+      <Column Name="Username" Type="System.String" DbType="VarChar(50) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="Password" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="Fullname" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="FirstSecurityQuestion" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="FirstSecurityAnswer" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="SecondSecurityQuestion" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="SecondSecurityAnswer" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="StartingInvestment" Type="System.Decimal" DbType="Decimal(20,2) NOT NULL" CanBeNull="false" />
+      <Column Name="AvailableCash" Type="System.Decimal" DbType="Decimal(20,2) NOT NULL" CanBeNull="false" />
+      <Column Name="TotalTrans" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="PositiveTrans" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="NegativeTrans" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Association Name="Account_Portfolio" Member="Portfolios" ThisKey="Username" OtherKey="Username" Type="Portfolio" />
+      <Association Name="Account_Transaction" Member="Transactions" ThisKey="Username" OtherKey="Username" Type="Transaction" />
+      <Association Name="Account_WatchStock" Member="WatchStocks" ThisKey="Username" OtherKey="Username" Type="WatchStock" />
     </Type>
   </Table>
 </Database>

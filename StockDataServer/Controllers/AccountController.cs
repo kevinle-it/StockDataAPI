@@ -41,5 +41,36 @@ namespace StockDataServer.Controllers
                         NegativeTrans = a.NegativeTrans
                     }).SingleOrDefault();
         }
+
+        [HttpPost]
+        public bool SignUp(string username, string password, string fullname, string firstSecurityQuestion, string firstSecurityAnswer, string secondSecurityQuestion, string secondSecurityAnswer)
+        {
+            try
+            {
+                DBStockTrainerDataContext db = new DBStockTrainerDataContext();
+
+                Account account = new Account();
+                account.Username = username;
+                account.Password = password;
+                account.Fullname = fullname;
+                account.FirstSecurityQuestion = firstSecurityQuestion;
+                account.FirstSecurityAnswer = firstSecurityAnswer;
+                account.SecondSecurityQuestion = secondSecurityQuestion;
+                account.SecondSecurityAnswer = secondSecurityAnswer;
+                account.StartingInvestment = 20000;
+                account.AvailableCash = 20000;
+                account.TotalTrans = 0;
+                account.PositiveTrans = 0;
+                account.NegativeTrans = 0;
+
+                db.Accounts.InsertOnSubmit(account);
+                db.SubmitChanges();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
     }
 }
