@@ -152,6 +152,7 @@
     </Compile>
     <Compile Include="Models\AccountTabModel.cs" />
     <Compile Include="Models\PortfolioTabModel.cs" />
+    <Compile Include="Models\SignUpModel.cs" />
     <Compile Include="Models\TransactionsTabModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

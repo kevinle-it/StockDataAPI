@@ -30,11 +30,11 @@ namespace StockDataServer.Controllers
                         EquityName = s.EquityName,
                         Price = s.Price,
                         Cost = p.Cost,
-                        GainLossMoney = 0,
+                        GainLossMoney = (s.Price - p.Cost) * p.NumStocks,
                         NumStocks = p.NumStocks,
-                        ChangeMoney = 0,
+                        ChangeMoney = s.Price - p.Cost,
                         Value = s.Price * p.NumStocks,
-                        ChangePercent = 0
+                        ChangePercent = (s.Price - p.Cost) / p.Cost
                     }).ToList();
         }
 

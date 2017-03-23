@@ -87,7 +87,7 @@ namespace StockDataServer.Controllers
                     transaction.Price = matchedStock.Price;
 
                     var matchedPortfolio = (from p in db.GetTable<Portfolio>()
-                                            where p.Ticker == ticker
+                                            where ((p.Ticker == ticker) && (p.Username == username))
                                             select p).SingleOrDefault();
                     if (matchedPortfolio == null)
                     {
