@@ -17,6 +17,16 @@ namespace StockDataServer.Controllers
         }
 
         [HttpGet]
+        public List<Stock> SearchStock(string searchData)
+        {
+            DBStockTrainerDataContext db = new DBStockTrainerDataContext();
+
+            return (from s in db.GetTable<Stock>()
+                    where ((s.Ticker.Contains(searchData)) || (s.EquityName.Contains(searchData)))
+                    select s).ToList();
+        }
+
+        [HttpGet]
         public Stock GetStock(string ticker)
         {
             DBStockTrainerDataContext db = new DBStockTrainerDataContext();

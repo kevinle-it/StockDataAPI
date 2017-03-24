@@ -34,7 +34,7 @@ namespace StockDataServer.Controllers
                         NumStocks = p.NumStocks,
                         ChangeMoney = s.Price - p.Cost,
                         Value = s.Price * p.NumStocks,
-                        ChangePercent = (s.Price - p.Cost) / p.Cost
+                        ChangePercent = Math.Round((((s.Price - p.Cost) / p.Cost) * 100), 2, MidpointRounding.AwayFromZero)
                     }).ToList();
         }
 
