@@ -139,6 +139,7 @@
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\HistoryController.cs" />
     <Compile Include="Controllers\PortfolioController.cs" />
     <Compile Include="Controllers\StockController.cs" />
     <Compile Include="Controllers\TransactionController.cs" />
@@ -151,6 +152,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AccountTabModel.cs" />
+    <Compile Include="Models\HistoryPriceModel.cs" />
     <Compile Include="Models\PortfolioTabModel.cs" />
     <Compile Include="Models\SignUpModel.cs" />
     <Compile Include="Models\TransactionsTabModel.cs" />
