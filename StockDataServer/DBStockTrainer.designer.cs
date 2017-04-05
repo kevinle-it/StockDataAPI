@@ -2015,7 +2015,13 @@ namespace StockDataServer
 		
 		private decimal _StartingInvestment;
 		
+		private decimal _StocksValue;
+		
 		private decimal _AvailableCash;
+		
+		private decimal _TotalValue;
+		
+		private decimal _Position;
 		
 		private long _TotalTrans;
 		
@@ -2051,8 +2057,14 @@ namespace StockDataServer
     partial void OnSecondSecurityAnswerChanged();
     partial void OnStartingInvestmentChanging(decimal value);
     partial void OnStartingInvestmentChanged();
+    partial void OnStocksValueChanging(decimal value);
+    partial void OnStocksValueChanged();
     partial void OnAvailableCashChanging(decimal value);
     partial void OnAvailableCashChanged();
+    partial void OnTotalValueChanging(decimal value);
+    partial void OnTotalValueChanged();
+    partial void OnPositionChanging(decimal value);
+    partial void OnPositionChanged();
     partial void OnTotalTransChanging(long value);
     partial void OnTotalTransChanged();
     partial void OnPositiveTransChanging(long value);
@@ -2234,8 +2246,29 @@ namespace StockDataServer
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_AvailableCash", DbType="Decimal(20,2) NOT NULL")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_StocksValue", DbType="Decimal(20,2) NOT NULL")]
 		[global::System.Runtime.Serialization.DataMemberAttribute(Order=9)]
+		public decimal StocksValue
+		{
+			get
+			{
+				return this._StocksValue;
+			}
+			set
+			{
+				if ((this._StocksValue != value))
+				{
+					this.OnStocksValueChanging(value);
+					this.SendPropertyChanging();
+					this._StocksValue = value;
+					this.SendPropertyChanged("StocksValue");
+					this.OnStocksValueChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_AvailableCash", DbType="Decimal(20,2) NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=10)]
 		public decimal AvailableCash
 		{
 			get
@@ -2255,8 +2288,50 @@ namespace StockDataServer
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_TotalValue", DbType="Decimal(20,2) NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=11)]
+		public decimal TotalValue
+		{
+			get
+			{
+				return this._TotalValue;
+			}
+			set
+			{
+				if ((this._TotalValue != value))
+				{
+					this.OnTotalValueChanging(value);
+					this.SendPropertyChanging();
+					this._TotalValue = value;
+					this.SendPropertyChanged("TotalValue");
+					this.OnTotalValueChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Position", DbType="Decimal(20,2) NOT NULL")]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=12)]
+		public decimal Position
+		{
+			get
+			{
+				return this._Position;
+			}
+			set
+			{
+				if ((this._Position != value))
+				{
+					this.OnPositionChanging(value);
+					this.SendPropertyChanging();
+					this._Position = value;
+					this.SendPropertyChanged("Position");
+					this.OnPositionChanged();
+				}
+			}
+		}
+		
 		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_TotalTrans", DbType="BigInt NOT NULL")]
-		[global::System.Runtime.Serialization.DataMemberAttribute(Order=10)]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=13)]
 		public long TotalTrans
 		{
 			get
@@ -2277,7 +2352,7 @@ namespace StockDataServer
 		}
 		
 		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PositiveTrans", DbType="BigInt NOT NULL")]
-		[global::System.Runtime.Serialization.DataMemberAttribute(Order=11)]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=14)]
 		public long PositiveTrans
 		{
 			get
@@ -2298,7 +2373,7 @@ namespace StockDataServer
 		}
 		
 		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_NegativeTrans", DbType="BigInt NOT NULL")]
-		[global::System.Runtime.Serialization.DataMemberAttribute(Order=12)]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=15)]
 		public long NegativeTrans
 		{
 			get
@@ -2319,7 +2394,7 @@ namespace StockDataServer
 		}
 		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_Portfolio", Storage="_Portfolios", ThisKey="Username", OtherKey="Username")]
-		[global::System.Runtime.Serialization.DataMemberAttribute(Order=13, EmitDefaultValue=false)]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=16, EmitDefaultValue=false)]
 		public EntitySet<Portfolio> Portfolios
 		{
 			get
@@ -2338,7 +2413,7 @@ namespace StockDataServer
 		}
 		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_Transaction", Storage="_Transactions", ThisKey="Username", OtherKey="Username")]
-		[global::System.Runtime.Serialization.DataMemberAttribute(Order=14, EmitDefaultValue=false)]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=17, EmitDefaultValue=false)]
 		public EntitySet<Transaction> Transactions
 		{
 			get
@@ -2357,7 +2432,7 @@ namespace StockDataServer
 		}
 		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_WatchStock", Storage="_WatchStocks", ThisKey="Username", OtherKey="Username")]
-		[global::System.Runtime.Serialization.DataMemberAttribute(Order=15, EmitDefaultValue=false)]
+		[global::System.Runtime.Serialization.DataMemberAttribute(Order=18, EmitDefaultValue=false)]
 		public EntitySet<WatchStock> WatchStocks
 		{
 			get

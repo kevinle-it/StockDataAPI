@@ -27,7 +27,7 @@ namespace StockDataServer.Controllers
         }
 
         [HttpGet]
-        public AccountTabModel GetAccountInfoByUsername(string username)
+        public AccountTabModel GetAccountTabDataByUsername(string username)
         {
             DBStockTrainerDataContext db = new DBStockTrainerDataContext();
             return (from a in db.GetTable<Account>()
@@ -35,7 +35,10 @@ namespace StockDataServer.Controllers
                     select new AccountTabModel {
                         Username = a.Username,
                         StartingInvestment = a.StartingInvestment,
+                        StocksValue = a.StocksValue,
                         AvailableCash = a.AvailableCash,
+                        TotalValue = a.TotalValue,
+                        Position = a.Position,
                         TotalTrans = a.TotalTrans,
                         PositiveTrans = a.PositiveTrans,
                         NegativeTrans = a.NegativeTrans

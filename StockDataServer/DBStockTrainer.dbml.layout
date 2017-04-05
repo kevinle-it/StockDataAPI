@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ordesignerObjectsDiagram dslVersion="1.0.0.0" absoluteBounds="0, 0, 11, 11" name="DBStockTrainer">
+<ordesignerObjectsDiagram dslVersion="1.0.0.0" absoluteBounds="0, 0, 11, 11.625" name="DBStockTrainer">
   <DataContextMoniker Name="/DBStockTrainerDataContext" />
   <nestedChildShapes>
     <classShape Id="10d24943-2ec6-44c9-b164-e7e88f493b28" absoluteBounds="3.5, 5.25, 2, 1.3862939453125005">
@@ -65,30 +65,30 @@
         <classShapeMoniker Id="4bd9976e-db02-4b32-ab88-6af51a5ddf6c" />
       </nodes>
     </associationConnector>
-    <classShape Id="6ef1e79d-bd30-454c-91f3-61faad125d6d" absoluteBounds="0.75, 7.5, 2, 3.1170068359375">
+    <classShape Id="f7028691-a37c-4de7-97f5-755a027e4c7c" absoluteBounds="0.75, 7.625, 2, 3.6939111328124996">
       <DataClassMoniker Name="/DBStockTrainerDataContext/Account" />
       <nestedChildShapes>
-        <elementListCompartment Id="65886eb1-892d-48da-bb1a-7588c888b661" absoluteBounds="0.76500000000000012, 7.9600000000000009, 1.9700000000000002, 2.5570068359375" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+        <elementListCompartment Id="0311d6b4-2111-4d48-8b9d-8bbb4c9b6533" absoluteBounds="0.765, 8.085, 1.9700000000000002, 3.1339111328125" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
-    <associationConnector edgePoints="[(2.75 : 10.5184554036458); (6.59375 : 10.5184554036458); (6.59375 : 4.70359537760417)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+    <associationConnector edgePoints="[(2.75 : 10.8694075520833); (6.59375 : 10.8694075520833); (6.59375 : 4.70359537760417)]" fixedFrom="Algorithm" fixedTo="Algorithm">
       <AssociationMoniker Name="/DBStockTrainerDataContext/Account/Account_Portfolio" />
       <nodes>
-        <classShapeMoniker Id="6ef1e79d-bd30-454c-91f3-61faad125d6d" />
+        <classShapeMoniker Id="f7028691-a37c-4de7-97f5-755a027e4c7c" />
         <classShapeMoniker Id="14d469de-4bf5-4ab7-a4e6-17f33abd42cb" />
       </nodes>
     </associationConnector>
     <associationConnector edgePoints="[(2.75 : 8.99120198567708); (3.5 : 8.99120198567708)]" fixedFrom="Algorithm" fixedTo="Algorithm">
       <AssociationMoniker Name="/DBStockTrainerDataContext/Account/Account_Transaction" />
       <nodes>
-        <classShapeMoniker Id="6ef1e79d-bd30-454c-91f3-61faad125d6d" />
+        <classShapeMoniker Id="f7028691-a37c-4de7-97f5-755a027e4c7c" />
         <classShapeMoniker Id="661980be-bd43-4dc7-b6bc-09fce69b76d0" />
       </nodes>
     </associationConnector>
-    <associationConnector edgePoints="[(2.75 : 7.50153746153846); (3.125 : 7.12653746153846); (3.125 : 3.30174638476563); (3.5 : 3.30174638476563)]" fixedFrom="NotFixed" fixedTo="Algorithm">
+    <associationConnector edgePoints="[(2.75 : 7.62653746153846); (3.125 : 7.25153746153846); (3.125 : 3.30174638476563); (3.5 : 3.30174638476563)]" fixedFrom="NotFixed" fixedTo="Algorithm">
       <AssociationMoniker Name="/DBStockTrainerDataContext/Account/Account_WatchStock" />
       <nodes>
-        <classShapeMoniker Id="6ef1e79d-bd30-454c-91f3-61faad125d6d" />
+        <classShapeMoniker Id="f7028691-a37c-4de7-97f5-755a027e4c7c" />
         <classShapeMoniker Id="4bd9976e-db02-4b32-ab88-6af51a5ddf6c" />
       </nodes>
     </associationConnector>

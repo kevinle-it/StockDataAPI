@@ -94,7 +94,10 @@
       <Column Name="SecondSecurityQuestion" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
       <Column Name="SecondSecurityAnswer" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
       <Column Name="StartingInvestment" Type="System.Decimal" DbType="Decimal(20,2) NOT NULL" CanBeNull="false" />
+      <Column Name="StocksValue" Type="System.Decimal" DbType="Decimal(20,2) NOT NULL" CanBeNull="false" />
       <Column Name="AvailableCash" Type="System.Decimal" DbType="Decimal(20,2) NOT NULL" CanBeNull="false" />
+      <Column Name="TotalValue" Type="System.Decimal" DbType="Decimal(20,2) NOT NULL" CanBeNull="false" />
+      <Column Name="Position" Type="System.Decimal" DbType="Decimal(20,2) NOT NULL" CanBeNull="false" />
       <Column Name="TotalTrans" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
       <Column Name="PositiveTrans" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
       <Column Name="NegativeTrans" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />

@@ -73,7 +73,11 @@ namespace StockDataServer.Controllers
                                 where s.Ticker == ticker
                                 select s).SingleOrDefault();
 
-            if (matchedStock != null)
+            var matchedUser = (from a in db.GetTable<Account>()
+                               where a.Username == username
+                               select a).SingleOrDefault();
+
+            if (matchedStock != null && matchedUser != null)
             {
                 try
                 {
@@ -106,12 +110,24 @@ namespace StockDataServer.Controllers
                         matchedPortfolio.NumStocks += numStocks;
                     }
 
-                    var matchedUser = (from a in db.GetTable<Account>()
-                                       where a.Username == username
-                                       select a).SingleOrDefault();
+                    if (matchedUser != null)
+                    {
+                        //var matchedPortfolios = (from p in db.GetTable<Portfolio>()
+                        //                         join s in db.GetTable<Stock>() on p.Ticker equals s.Ticker
+                        //                         where p.Username == username
+                        //                         select new { p, s }).ToList();
 
-                    matchedUser.AvailableCash -= (matchedStock.Price * numStocks);
-                    ++matchedUser.TotalTrans;
+                        //foreach (var item in matchedPortfolios)
+                        //{
+                        //    matchedUser.StocksValue += item.s.Price * item.p.NumStocks;
+                        //}
+
+                        matchedUser.StocksValue += matchedStock.Price * numStocks;
+                        matchedUser.AvailableCash -= (matchedStock.Price * numStocks) + 10;
+                        matchedUser.TotalValue = matchedUser.StocksValue + matchedUser.AvailableCash;
+                        matchedUser.Position = matchedUser.TotalValue - matchedUser.StartingInvestment;
+                        ++matchedUser.TotalTrans;
+                    }
 
                     db.Transactions.InsertOnSubmit(transaction);
                     db.SubmitChanges();
