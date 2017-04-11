@@ -30,15 +30,26 @@ namespace StockDataServer.Controllers
         public AccountTabModel GetAccountTabDataByUsername(string username)
         {
             DBStockTrainerDataContext db = new DBStockTrainerDataContext();
+
+            var matchedPortfolios = (from p in db.GetTable<Portfolio>()
+                                     join s in db.GetTable<Stock>() on p.Ticker equals s.Ticker
+                                     where p.Username == username
+                                     select new { p, s }).ToList();
+            decimal stocksValue = 0;
+            foreach (var item in matchedPortfolios)
+            {
+                stocksValue += item.s.Price * item.p.NumStocks;
+            }
+
             return (from a in db.GetTable<Account>()
                     where (a.Username == username)
                     select new AccountTabModel {
                         Username = a.Username,
                         StartingInvestment = a.StartingInvestment,
-                        StocksValue = a.StocksValue,
+                        StocksValue = stocksValue,
                         AvailableCash = a.AvailableCash,
-                        TotalValue = a.TotalValue,
-                        Position = a.Position,
+                        TotalValue = stocksValue + a.AvailableCash,
+                        Position = (stocksValue + a.AvailableCash) - a.StartingInvestment,
                         TotalTrans = a.TotalTrans,
                         PositiveTrans = a.PositiveTrans,
                         NegativeTrans = a.NegativeTrans

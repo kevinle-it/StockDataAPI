@@ -11,6 +11,7 @@ namespace StockDataServer.Controllers
     public class TransactionController : ApiController
     {
         const string BUY = "Buy";
+        const string SELL = "Sell";
 
         [HttpGet]
         public List<TransactionsTabModel> GetTransactionsByUserName(string username)
@@ -65,53 +66,55 @@ namespace StockDataServer.Controllers
         }
 
         [HttpPost]
-        public bool Buy(string username, string ticker, long numStocks)
+        public bool BuySell(string username, string ticker, long numStocks, string transactionType)
         {
             DBStockTrainerDataContext db = new DBStockTrainerDataContext();
 
-            var matchedStock = (from s in db.GetTable<Stock>()
-                                where s.Ticker == ticker
-                                select s).SingleOrDefault();
-
-            var matchedUser = (from a in db.GetTable<Account>()
-                               where a.Username == username
-                               select a).SingleOrDefault();
-
-            if (matchedStock != null && matchedUser != null)
+            if (transactionType.Equals(BUY, StringComparison.InvariantCultureIgnoreCase))
             {
-                try
+                var matchedStock = (from s in db.GetTable<Stock>()
+                                    where s.Ticker == ticker
+                                    select s).SingleOrDefault();
+
+                var matchedUser = (from a in db.GetTable<Account>()
+                                   where a.Username == username
+                                   select a).SingleOrDefault();
+
+                if (matchedStock != null && matchedUser != null)
                 {
-                    Transaction transaction = new Transaction();
-                    transaction.Username = username;
-                    transaction.Ticker = matchedStock.Ticker;
-                    transaction.EquityName = matchedStock.EquityName;
-                    transaction.Date = DateTime.Now;
-                    transaction.Type = BUY;
-                    transaction.NumStocks = numStocks;
-                    transaction.Price = matchedStock.Price;
-
-                    var matchedPortfolio = (from p in db.GetTable<Portfolio>()
-                                            where ((p.Ticker == ticker) && (p.Username == username))
-                                            select p).SingleOrDefault();
-                    if (matchedPortfolio == null)
+                    try
                     {
-                        Portfolio portfolio = new Portfolio();
+                        Transaction transaction = new Transaction();
+                        transaction.Username = username;
+                        transaction.Ticker = matchedStock.Ticker;
+                        transaction.EquityName = matchedStock.EquityName;
+                        transaction.Date = DateTime.Now;
+                        transaction.Type = BUY;
+                        transaction.NumStocks = numStocks;
+                        transaction.Price = matchedStock.Price;
 
-                        portfolio.Username = username;
-                        portfolio.Ticker = matchedStock.Ticker;
-                        portfolio.Cost = matchedStock.Price;
-                        portfolio.NumStocks = numStocks;
+                        db.Transactions.InsertOnSubmit(transaction);
 
-                        db.Portfolios.InsertOnSubmit(portfolio);
-                    }
-                    else
-                    {
-                        matchedPortfolio.Cost = ((matchedPortfolio.NumStocks * matchedPortfolio.Cost) + (numStocks * matchedStock.Price)) / (matchedPortfolio.NumStocks + numStocks);
-                        matchedPortfolio.NumStocks += numStocks;
-                    }
+                        var matchedPortfolio = (from p in db.GetTable<Portfolio>()
+                                                where ((p.Ticker == ticker) && (p.Username == username))
+                                                select p).SingleOrDefault();
+                        if (matchedPortfolio == null)
+                        {
+                            Portfolio portfolio = new Portfolio();
 
-                    if (matchedUser != null)
-                    {
+                            portfolio.Username = username;
+                            portfolio.Ticker = matchedStock.Ticker;
+                            portfolio.Cost = matchedStock.Price;
+                            portfolio.NumStocks = numStocks;
+
+                            db.Portfolios.InsertOnSubmit(portfolio);
+                        }
+                        else
+                        {
+                            matchedPortfolio.Cost = Math.Round(((matchedPortfolio.NumStocks * matchedPortfolio.Cost) + (numStocks * matchedStock.Price)) / (matchedPortfolio.NumStocks + numStocks), 2, MidpointRounding.AwayFromZero);
+                            matchedPortfolio.NumStocks += numStocks;
+                        }
+
                         //var matchedPortfolios = (from p in db.GetTable<Portfolio>()
                         //                         join s in db.GetTable<Stock>() on p.Ticker equals s.Ticker
                         //                         where p.Username == username
@@ -122,25 +125,82 @@ namespace StockDataServer.Controllers
                         //    matchedUser.StocksValue += item.s.Price * item.p.NumStocks;
                         //}
 
-                        matchedUser.StocksValue += matchedStock.Price * numStocks;
                         matchedUser.AvailableCash -= (matchedStock.Price * numStocks) + 10;
-                        matchedUser.TotalValue = matchedUser.StocksValue + matchedUser.AvailableCash;
-                        matchedUser.Position = matchedUser.TotalValue - matchedUser.StartingInvestment;
                         ++matchedUser.TotalTrans;
+
+                        db.SubmitChanges();
+                    }
+                    catch (Exception)
+                    {
+                        return false;
                     }
 
-                    db.Transactions.InsertOnSubmit(transaction);
-                    db.SubmitChanges();
-                }
-                catch (Exception)
-                {
-                    return false;
+                    return true;
                 }
 
-                return true;
+                return false;
             }
+            else    // transactionType == SELL
+            {
+                var matchedStock = (from s in db.GetTable<Stock>()
+                                    where s.Ticker == ticker
+                                    select s).SingleOrDefault();
 
-            return false;
+                var matchedUser = (from a in db.GetTable<Account>()
+                                   where a.Username == username
+                                   select a).SingleOrDefault();
+
+                var matchedPortfolio = (from p in db.GetTable<Portfolio>()
+                                        where ((p.Ticker == ticker) && (p.Username == username))
+                                        select p).SingleOrDefault();
+
+                if (matchedStock != null && matchedUser != null && matchedPortfolio != null)
+                {
+                    try
+                    {
+                        Transaction transaction = new Transaction();
+                        transaction.Username = username;
+                        transaction.Ticker = matchedStock.Ticker;
+                        transaction.EquityName = matchedStock.EquityName;
+                        transaction.Date = DateTime.Now;
+                        transaction.Type = SELL;
+                        transaction.NumStocks = numStocks;
+                        transaction.Price = matchedStock.Price;
+                        transaction.GainLossMoney = Math.Round((matchedStock.Price - matchedPortfolio.Cost) * numStocks, 3, MidpointRounding.AwayFromZero);
+                        transaction.GainLossPercent = Math.Round((matchedStock.Price - matchedPortfolio.Cost) / matchedPortfolio.Cost, 3, MidpointRounding.AwayFromZero);
+
+                        db.Transactions.InsertOnSubmit(transaction);
+
+                        matchedPortfolio.NumStocks -= numStocks;
+
+                        if (matchedPortfolio.NumStocks == 0)
+                        {
+                            db.Portfolios.DeleteOnSubmit(matchedPortfolio);
+                        }
+
+                        matchedUser.AvailableCash += (matchedStock.Price * numStocks) - 10;
+                        ++matchedUser.TotalTrans;
+                        if (transaction.GainLossMoney > 0)
+                        {
+                            ++matchedUser.PositiveTrans;
+                        }
+                        else if (transaction.GainLossMoney < 0)
+                        {
+                            ++matchedUser.NegativeTrans;
+                        }
+
+                        db.SubmitChanges();
+                    }
+                    catch (Exception)
+                    {
+                        return false;
+                    }
+
+                    return true;
+                }
+
+                return false;
+            }
         }
     }
 }
