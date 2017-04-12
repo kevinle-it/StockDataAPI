@@ -22,8 +22,8 @@ namespace StockDataServer.Controllers
 
             //}
             return (from p in db.GetTable<Portfolio>()
-                    from s in db.GetTable<Stock>()
-                    where ((p.Username == username) && (p.Ticker == s.Ticker))
+                    join s in db.GetTable<Stock>() on p.Ticker equals s.Ticker
+                    where p.Username == username
                     select new PortfolioTabModel
                     {
                         Ticker = s.Ticker,
@@ -44,19 +44,19 @@ namespace StockDataServer.Controllers
             DBStockTrainerDataContext db = new DBStockTrainerDataContext();
             //return db.Portfolios.FirstOrDefault(x => x.AccountID == accountID);
             return (from p in db.GetTable<Portfolio>()
-                    from s in db.GetTable<Stock>()
-                    where ((p.Username == username) && (p.Ticker == ticker) && (p.Ticker == s.Ticker))
+                    join s in db.GetTable<Stock>() on p.Ticker equals s.Ticker
+                    where ((p.Username == username) && (p.Ticker == ticker))
                     select new PortfolioTabModel
                     {
                         Ticker = s.Ticker,
                         EquityName = s.EquityName,
                         Price = s.Price,
                         Cost = p.Cost,
-                        GainLossMoney = 0,
+                        GainLossMoney = (s.Price - p.Cost) * p.NumStocks,
                         NumStocks = p.NumStocks,
-                        ChangeMoney = 0,
+                        ChangeMoney = s.Price - p.Cost,
                         Value = s.Price * p.NumStocks,
-                        ChangePercent = 0
+                        ChangePercent = Math.Round((((s.Price - p.Cost) / p.Cost) * 100), 3, MidpointRounding.AwayFromZero)
                     }).FirstOrDefault();
         }
 
@@ -138,7 +138,7 @@ namespace StockDataServer.Controllers
                          where ((p.Username == username) && (p.Ticker == ticker))
                          select p).SingleOrDefault();
 
-            Portfolio portfolio = db.Portfolios.FirstOrDefault(x => x.Username == username);
+            //Portfolio portfolio = db.Portfolios.FirstOrDefault(x => x.Username == username);
             //if (portfolio == null) return false;
 
             //db.Portfolios.DeleteOnSubmit(portfolio);

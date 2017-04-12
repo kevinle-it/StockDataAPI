@@ -70,15 +70,20 @@ namespace StockDataServer.Controllers
         {
             DBStockTrainerDataContext db = new DBStockTrainerDataContext();
 
+            var matchedStock = (from s in db.GetTable<Stock>()
+                                where s.Ticker == ticker
+                                select s).SingleOrDefault();
+
+            var matchedUser = (from a in db.GetTable<Account>()
+                               where a.Username == username
+                               select a).SingleOrDefault();
+
             if (transactionType.Equals(BUY, StringComparison.InvariantCultureIgnoreCase))
             {
-                var matchedStock = (from s in db.GetTable<Stock>()
-                                    where s.Ticker == ticker
-                                    select s).SingleOrDefault();
-
-                var matchedUser = (from a in db.GetTable<Account>()
-                                   where a.Username == username
-                                   select a).SingleOrDefault();
+                if (matchedUser.AvailableCash - (matchedStock.Price * numStocks) < 0)       // Not Enough Available Cash for Buying.
+                {
+                    return false;
+                }
 
                 if (matchedStock != null && matchedUser != null)
                 {
@@ -111,7 +116,7 @@ namespace StockDataServer.Controllers
                         }
                         else
                         {
-                            matchedPortfolio.Cost = Math.Round(((matchedPortfolio.NumStocks * matchedPortfolio.Cost) + (numStocks * matchedStock.Price)) / (matchedPortfolio.NumStocks + numStocks), 2, MidpointRounding.AwayFromZero);
+                            matchedPortfolio.Cost = Math.Round(((matchedPortfolio.NumStocks * matchedPortfolio.Cost) + (numStocks * matchedStock.Price)) / (matchedPortfolio.NumStocks + numStocks), 3, MidpointRounding.AwayFromZero);
                             matchedPortfolio.NumStocks += numStocks;
                         }
 
@@ -140,19 +145,16 @@ namespace StockDataServer.Controllers
 
                 return false;
             }
-            else    // transactionType == SELL
+            if (transactionType.Equals(SELL, StringComparison.InvariantCultureIgnoreCase))
             {
-                var matchedStock = (from s in db.GetTable<Stock>()
-                                    where s.Ticker == ticker
-                                    select s).SingleOrDefault();
-
-                var matchedUser = (from a in db.GetTable<Account>()
-                                   where a.Username == username
-                                   select a).SingleOrDefault();
-
                 var matchedPortfolio = (from p in db.GetTable<Portfolio>()
                                         where ((p.Ticker == ticker) && (p.Username == username))
                                         select p).SingleOrDefault();
+
+                if (matchedPortfolio.NumStocks < numStocks)     // Not Enough Available Shares for Selling.
+                {
+                    return false;
+                }
 
                 if (matchedStock != null && matchedUser != null && matchedPortfolio != null)
                 {
@@ -201,6 +203,8 @@ namespace StockDataServer.Controllers
 
                 return false;
             }
+
+            return false;
         }
     }
 }
